@@ -5,6 +5,7 @@ A premium, hyper-minimalist Chrome Extension that auto-groups your tabs dynamica
 ## 🚀 Installation
 
 1.  **Download this repo** — click the green **Code** button above, then **Download ZIP**. Unzip the folder somewhere on your computer.
+    - Or via the command line: `git clone https://github.com/MananSharma26/StacTab.git`
 2.  Open Google Chrome and go to: `chrome://extensions/`
 3.  Toggle **Developer mode** ON (top-right corner).
 4.  Click **Load unpacked** (top-left corner).
