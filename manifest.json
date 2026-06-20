@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Stac Tab",
+  "version": "1.2.1",
+  "description": "Auto-groups tabs, sorts by URL, sleeps inactive tabs, and securely manages sessions.",
+  "permissions": ["tabs", "tabGroups", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": { 
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icon_v2.png", "24": "icon_v2.png", "32": "icon_v2.png" }
+  },
+  "icons": { "16": "icon_v2.png", "24": "icon_v2.png", "32": "icon_v2.png", "48": "icon_v2.png", "128": "icon_v2.png" },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+S",
+        "mac": "Alt+S"
+      },
+      "description": "Open Stac Tab & Search"
+    }
+  }
+}
