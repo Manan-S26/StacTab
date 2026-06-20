@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="tab-url">${escapeHTML(item.url)}</span>
               </div>
               <div class="tab-actions">
-                <button class="btn btn-restore-single" data-id="${item.id}" data-url="${escapeHTML(item.url)}">Restore</button>
-                <button class="btn btn-delete btn-icon btn-delete-single" data-id="${item.id}" title="Remove tab">✕</button>
+                <button class="btn btn-restore-single" data-id="${escapeHTML(item.id)}" data-url="${escapeHTML(item.url)}">Restore</button>
+                <button class="btn btn-delete btn-icon btn-delete-single" data-id="${escapeHTML(item.id)}" title="Remove tab">✕</button>
               </div>
             </div>`;
         });
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const imported = JSON.parse(ev.target.result);
         if (!Array.isArray(imported)) throw new Error();
-        const valid = imported.filter(i => i.url && i.title && i.date);
+        const valid = imported.filter(i => i.url && i.title && i.date && /^https?:\/\//i.test(i.url));
         chrome.storage.local.get({ archives: [] }, res => {
           const existingIds = new Set(res.archives.map(a => String(a.id)));
           const newItems = valid.filter(i => !existingIds.has(String(i.id)));
