@@ -2,16 +2,13 @@
 
 A premium, hyper-minimalist Chrome Extension that auto-groups your tabs dynamically, sleeps inactive tabs to save RAM, dedupes duplicates, and lets you archive custom workspaces into a beautiful pinned dashboard.
 
-## 🚀 One-Click Installation
+## 🚀 Installation
 
-1.  **Clone this repository** to your local machine:
-    \`\`\`bash
-    git clone https://github.com/MananSharma26/StacTab.git
-    \`\`\`
-2.  Open Google Chrome and navigate to: \`chrome://extensions/\`
-3.  Toggle the **Developer mode** switch in the top-right corner to **ON**.
-4.  Click the **Load unpacked** button in the top-left corner.
-5.  Select the cloned \`StacTab\` folder.
+1.  **Download this repo** — click the green **Code** button above, then **Download ZIP**. Unzip the folder somewhere on your computer.
+2.  Open Google Chrome and go to: `chrome://extensions/`
+3.  Toggle **Developer mode** ON (top-right corner).
+4.  Click **Load unpacked** (top-left corner).
+5.  Select the unzipped `StacTab` folder.
 
 ## ✨ Features
 - **Auto-Pilot Mode:** Automatically groups matching tabs and color-codes them. Group threshold (2–5 tabs) is configurable directly from the popup.
