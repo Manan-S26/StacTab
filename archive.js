@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="date-title">${escapeHTML(date)}</div>
           <div class="actions-right">
             <button class="btn btn-export btn-download-txt" data-date="${escapeHTML(date)}">↓ Export .txt</button>
-            <button class="btn btn-new-window btn-new-window-day" data-date="${escapeHTML(date)}">↗ Window</button>
+            <button class="btn btn-new-window btn-new-window-day" data-date="${escapeHTML(date)}">↗ New window</button>
             <button class="btn btn-restore-day" data-date="${escapeHTML(date)}">Restore Day</button>
             <button class="btn btn-delete btn-delete-day" data-date="${escapeHTML(date)}">Delete</button>
           </div>
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="domain-header-row">
             <div class="domain-title">${escapeHTML(domain)} <span style="opacity:0.5;">(${items.length})</span></div>
             <div class="actions-right">
-              <button class="btn btn-new-window btn-new-window-domain" data-date="${escapeHTML(date)}" data-domain="${escapeHTML(domain)}">↗ Window</button>
+              <button class="btn btn-new-window btn-new-window-domain" data-date="${escapeHTML(date)}" data-domain="${escapeHTML(domain)}">↗ New window</button>
               <button class="btn btn-restore-domain" data-date="${escapeHTML(date)}" data-domain="${escapeHTML(domain)}">Restore</button>
               <button class="btn btn-delete btn-delete-domain" data-date="${escapeHTML(date)}" data-domain="${escapeHTML(domain)}">Delete</button>
             </div>

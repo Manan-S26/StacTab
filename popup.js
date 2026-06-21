@@ -27,9 +27,6 @@ function getSmartName(urlObj) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('StacTab: popup.js loaded');
-  try {
-
   const logo = document.getElementById('brand-logo');
   if(logo) {
     logo.addEventListener('error', function() { this.style.display = 'none'; });
@@ -235,7 +232,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function archiveTabs(tabsToArchive, sessionName = null) {
     tabsToArchive = tabsToArchive.filter(t => { try { return new URL(t.url).protocol.startsWith('http'); } catch(e) { return false; } });
-    if (tabsToArchive.length === 0) return;
+    if (tabsToArchive.length === 0) {
+      const btn = document.getElementById('btn-sort');
+      const orig = btn.textContent;
+      btn.textContent = 'Nothing to archive (no web tabs)';
+      setTimeout(() => { btn.innerHTML = '<span style="font-size: 16px;">✦</span> Organize tabs into groups'; }, 1500);
+      return;
+    }
     chrome.storage.local.get({ archives: [] }, (res) => {
       const dateStr = sessionName || new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
       const newItems = tabsToArchive.map(t => ({
@@ -267,12 +270,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   document.getElementById('arc-current').addEventListener('click', () => {
-    console.log('StacTab: arc-current clicked');
     chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-      console.log('StacTab: got tabs', tabs);
-      if (chrome.runtime.lastError) { console.error('StacTab:', chrome.runtime.lastError); return; }
+      if (chrome.runtime.lastError) return;
       if (tabs && tabs[0]) archiveTabs([tabs[0]]);
-      else console.log('StacTab: no active tab found');
     });
   });
   document.getElementById('arc-all').addEventListener('click', () => {
@@ -311,6 +311,4 @@ document.addEventListener('DOMContentLoaded', function() {
       btnDashboard.addEventListener('click', openDashboard);
   }
 
-  console.log('StacTab: all handlers registered');
-  } catch(e) { console.error('StacTab INIT ERROR:', e); }
 });
