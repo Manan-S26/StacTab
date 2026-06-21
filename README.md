@@ -18,8 +18,8 @@ Stop hoarding 100 tabs. StacTab auto-groups, sleeps, dedupes, and archives them 
 - **Dedupe Tabs:** Instantly detects and closes duplicate URLs.
 - **Live Tab Badge:** The extension icon always shows your current tab count.
 - **Workspace Vault:** Archive sessions into a dashboard with live search, sort order toggle, and JSON export/import.
-  - **Name your sessions** — give any "Archive All" action a custom name (e.g. "Work", "Research") instead of the default date.
-  - **Archive a Group** — archive an entire tab group directly from the popup.
-  - **Restore to New Window** — reopen a day or domain group in a brand-new Chrome window.
-  - **Undo** — a 60-second undo banner appears in the vault after any archive action.
+  - **Name your sessions:** give any "Archive All" action a custom name (e.g. "Work", "Research") instead of the default date.
+  - **Archive a Group:** archive an entire tab group directly from the popup.
+  - **Restore to New Window:** reopen a day or domain group in a brand-new Chrome window.
+  - **Undo:** a 60-second undo banner appears in the vault after any archive action.
 - **`Alt+S` / `Option+S` Shortcut:** Instantly open the popup and focus the live tab search bar.
