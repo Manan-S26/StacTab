@@ -567,20 +567,21 @@
       flex-direction: column;
     }
     @keyframes search-type {
-      0%, 10%   { width: 0ch }
-      18%       { width: 1ch }
-      26%       { width: 2ch }
-      34%       { width: 3ch }
-      42%       { width: 4ch }
-      50%       { width: 5ch }
-      58%       { width: 6ch }
-      66%, 83%  { width: 7ch }
-      93%, 100% { width: 0ch }
+      /* Each pair creates an instant snap — no smooth interpolation */
+      0%,    9.9%  { width: 0ch }
+      10%,  19.9%  { width: 1ch }
+      20%,  29.9%  { width: 2ch }
+      30%,  39.9%  { width: 3ch }
+      40%,  49.9%  { width: 4ch }
+      50%,  59.9%  { width: 5ch }
+      60%,  69.9%  { width: 6ch }
+      70%,  83.9%  { width: 7ch }
+      84%,  100%   { width: 0ch }
     }
     @keyframes fade-in-results {
-      0%, 68%   { opacity: 0; transform: translateY(5px); }
-      76%, 82%  { opacity: 1; transform: translateY(0); }
-      92%, 100% { opacity: 0; transform: translateY(0); }
+      0%,   71%  { opacity: 0; transform: translateY(5px); }
+      79%,  83%  { opacity: 1; transform: translateY(0); }
+      88%, 100%  { opacity: 0; transform: translateY(0); }
     }
 
     /* before/after tab visual */
@@ -1476,7 +1477,7 @@
 
           <!-- Swoosh arrow -->
           <div style="display:flex;align-items:center;justify-content:center;padding:6px 0;">
-            <svg width="260" height="76" viewBox="0 0 260 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="260" height="86" viewBox="0 0 260 86" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="swoosh-grad" x1="0%" y1="50%" x2="100%" y2="50%">
                   <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.1"/>
@@ -1484,10 +1485,10 @@
                   <stop offset="100%" stop-color="#7C3AED" stop-opacity="0.95"/>
                 </linearGradient>
               </defs>
-              <!-- Tapered brush-stroke body -->
-              <path d="M 16 22 C 38 12, 108 10, 178 38 L 177 50 C 109 30, 42 28, 20 28 Z" fill="url(#swoosh-grad)"/>
-              <!-- Bold wide solid arrowhead (2.5x) -->
-              <polygon points="166,58 203,44 182,18" fill="#7C3AED"/>
+              <!-- Tapered body: thin top-left → thick bottom-right (~30° diagonal) -->
+              <path d="M 16 14 C 60 8, 120 18, 176 52 L 173 64 C 120 30, 62 22, 20 20 Z" fill="url(#swoosh-grad)"/>
+              <!-- Wide arrowhead aligned to curve direction (direction from cp2→endpoint: ~31°) -->
+              <polygon points="165,73 193,69 184,43" fill="#7C3AED"/>
             </svg>
           </div>
 
@@ -1514,11 +1515,11 @@
               <!-- Animated search input -->
               <div style="background:#EDE9FE;border:1px solid #DDD6FE;border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:8px;font-size:.75rem;margin-bottom:8px;">
                 <span style="color:#A78BFA;">🔍</span>
-                <span style="color:#1F1A33;font-weight:600;font-family:monospace;overflow:hidden;white-space:nowrap;display:inline-block;animation:search-type 6s linear infinite;">youtube</span>
+                <span style="color:#1F1A33;font-weight:600;font-family:monospace;overflow:hidden;white-space:nowrap;display:inline-block;animation:search-type 7s linear infinite;">youtube</span>
                 <span style="display:inline-block;width:1.5px;height:13px;background:#8B5CF6;animation:blink 1s infinite;flex-shrink:0;"></span>
               </div>
               <!-- Results fade in after typing -->
-              <div style="background:#FAFAFE;border:1px solid #E5E0FF;border-radius:8px;overflow:hidden;animation:fade-in-results 6s ease infinite;">
+              <div style="background:#FAFAFE;border:1px solid #E5E0FF;border-radius:8px;overflow:hidden;animation:fade-in-results 7s ease infinite;">
                 <div style="padding:7px 12px;border-bottom:1px solid #F5F3FF;display:flex;align-items:center;gap:8px;">
                   <span style="font-size:.8rem;">▶️</span>
                   <div>
@@ -1661,7 +1662,7 @@
     <div class="container">
       <p class="section-eyebrow fade-in">Workspace Vault</p>
       <h2 class="section-title fade-in fade-in-delay-1" style="color:#fff;">Your sessions. <span style="color:#C4B5FD;">Safe, searchable, forever.</span></h2>
-      <p class="section-sub fade-in fade-in-delay-2">The Workspace Vault is StacTab's most powerful feature: a fully-featured tab archive that lives entirely in your browser.</p>
+      <p class="section-sub fade-in fade-in-delay-2" style="white-space:nowrap;">The Workspace Vault is StacTab's most powerful feature — a tab archive that lives entirely in your browser.</p>
 
       <div class="vault-inner">
         <div>
@@ -1799,7 +1800,7 @@
     <div class="container">
       <p class="section-eyebrow fade-in">Get Started</p>
       <h2 class="section-title fade-in fade-in-delay-1">Up and running in <span style="color:#8B5CF6;">under 60 seconds.</span></h2>
-      <p class="section-sub fade-in fade-in-delay-2">No Chrome Web Store listing yet. Install directly from source. It takes less than a minute.</p>
+      <p class="section-sub fade-in fade-in-delay-2">Install directly from source.</p>
 
       <div class="install-grid">
         <div>
