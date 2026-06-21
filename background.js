@@ -125,6 +125,33 @@ function archiveTabs(tabsToArchive) {
     });
 }
 
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'organize-tabs') {
+    chrome.storage.local.get({ groupThreshold: 2 }, (settings) => {
+      chrome.tabs.query({ currentWindow: true }, (tabs) => {
+        const groups = {};
+        tabs.forEach(tab => {
+          if (chrome.tabGroups && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) return;
+          try {
+            const url = new URL(tab.url);
+            if (!url.protocol.startsWith('http')) return;
+            const name = getSmartName(url);
+            if (!groups[name]) groups[name] = [];
+            groups[name].push(tab.id);
+          } catch(e) {}
+        });
+        for (const [name, tabIds] of Object.entries(groups)) {
+          if (tabIds.length >= settings.groupThreshold) {
+            chrome.tabs.group({ tabIds }, (groupId) => {
+              chrome.tabGroups.update(groupId, { title: name });
+            });
+          }
+        }
+      });
+    });
+  }
+});
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "stac-parent",

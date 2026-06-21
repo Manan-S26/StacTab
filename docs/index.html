@@ -1397,12 +1397,12 @@
           <!-- search bar -->
           <div class="pmi-search">
             <span class="pmi-search-icon">🔍</span>
-            <span class="pmi-search-text">Search tabs... (Alt+S)</span>
+            <span class="pmi-search-text">Search tabs... (Alt+S / Option+S)</span>
             <div class="pmi-cursor"></div>
           </div>
 
           <!-- organize button -->
-          <div class="pmi-organize-btn">✦ Organize tabs into groups</div>
+          <div class="pmi-organize-btn">✦ Organize tabs into groups <span style="opacity:.5;font-size:.7em;">Alt+G</span></div>
 
           <!-- tool bar -->
           <div class="pmi-toolbar">
@@ -1466,11 +1466,11 @@
           <ul class="fade-in fade-in-delay-3" style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:20px;">
             <li style="display:flex;align-items:flex-start;gap:12px;">
               <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">⚡</span>
-              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Auto-grouping:</strong> Watches your tabs in real time and groups matching domains automatically, the moment your threshold is crossed.</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Auto-grouping:</strong> Watches your tabs in real time and groups tabs by domain name automatically the moment your threshold is crossed. No configuration needed.</span>
             </li>
             <li style="display:flex;align-items:flex-start;gap:12px;">
               <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🔍</span>
-              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Instant search:</strong> Hit <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+S</kbd> from anywhere to search every open tab by title or URL in real time.</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Instant search:</strong> Hit <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+S</kbd> to search every open tab by title or URL in real time. <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+G</kbd> to instantly group all tabs by domain.</span>
             </li>
             <li style="display:flex;align-items:flex-start;gap:12px;">
               <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🗄️</span>
@@ -1599,9 +1599,7 @@
           <div class="feature-icon-wrap">⚡</div>
           <div class="feature-title">Auto-Pilot Mode</div>
           <div class="feature-desc">
-            Set it and forget it. StacTab watches your tabs in real time and automatically
-            groups tabs from the same domain with color-coding the moment your
-            configurable threshold (2 to 5 tabs) is crossed.
+            Set it and forget it. StacTab watches your tabs in real time and automatically groups tabs by domain name the moment your threshold (2 to 5 tabs) is crossed. Color-coded, no clicks needed.
           </div>
           <span class="feature-tag">⭐ Automatic Organisation</span>
         </div>
@@ -1610,8 +1608,7 @@
           <div class="feature-icon-wrap">🗂️</div>
           <div class="feature-title">Smart Organize</div>
           <div class="feature-desc">
-            One click groups all open tabs by domain into named, color-coded Chrome tab groups.
-            Perfect when you've been browsing freely and want to instantly bring order to chaos.
+            When Auto-Pilot is off, hit <strong>Alt+G</strong> (Option+G on Mac) to instantly group all open tabs by domain name into color-coded Chrome tab groups. One keystroke, instant order.
           </div>
           <!-- browser tab bar visual: before grouped vs after grouped -->
           <div class="feature-visual">
@@ -1678,7 +1675,7 @@
           <div class="feature-desc">
             Instantly filter all open tabs by title or URL as you type.
             Hit <span class="kbd"><kbd>Alt</kbd><kbd>S</kbd></span> on Windows / <span class="kbd"><kbd>Option</kbd><kbd>S</kbd></span> on Mac
-            to open StacTab and jump directly to the search. No more hunting through tab rows.
+            to search across all your open tabs from anywhere. No more hunting through tab rows.
           </div>
           <span class="feature-tag">Alt+S · ⌥S</span>
         </div>
