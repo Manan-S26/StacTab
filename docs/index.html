@@ -1443,8 +1443,8 @@
         <!-- Before → After vertical visual + search -->
         <div class="fade-in fade-in-delay-2 what-right-col">
 
-          <!-- BEFORE: chaotic packed tabs -->
-          <div style="background:#FFF7F7;border:1px solid #FECACA;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
+          <!-- BEFORE: chaotic packed tabs — shifted down slightly -->
+          <div style="margin-top:28px;background:#FFF7F7;border:1px solid #FECACA;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
             <div style="background:#E8EAED;padding:5px 6px 0;display:flex;gap:1px;align-items:flex-end;flex-wrap:wrap;overflow:hidden;max-height:52px;">
               <div class="fv-tab fv-tab-grey" style="padding:3px 5px;max-width:28px;">gh</div>
               <div class="fv-tab fv-tab-grey" style="padding:3px 5px;max-width:28px;opacity:.9;">G</div>
@@ -1476,19 +1476,17 @@
           </div>
 
           <!-- Swoosh arrow -->
-          <div style="display:flex;align-items:center;justify-content:center;padding:6px 0;">
+          <div style="display:flex;align-items:center;justify-content:center;padding:3px 0;">
             <svg width="260" height="86" viewBox="0 0 260 86" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="swoosh-grad" x1="0%" y1="50%" x2="100%" y2="50%">
                   <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.1"/>
                   <stop offset="65%" stop-color="#8B5CF6" stop-opacity="0.75"/>
-                  <stop offset="100%" stop-color="#7C3AED" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#7C3AED" stop-opacity="1"/>
                 </linearGradient>
               </defs>
-              <!-- Tapered body: thin top-left → thick bottom-right (~30° diagonal) -->
-              <path d="M 16 14 C 60 8, 120 18, 176 52 L 173 64 C 120 30, 62 22, 20 20 Z" fill="url(#swoosh-grad)"/>
-              <!-- Wide arrowhead aligned to curve direction (direction from cp2→endpoint: ~31°) -->
-              <polygon points="165,73 193,69 184,43" fill="#7C3AED"/>
+              <!-- Single unified path: body flows directly into arrowhead, no gap -->
+              <path d="M 16 14 C 60 6, 120 16, 184 43 L 193 69 L 165 73 C 110 38, 58 22, 20 20 Z" fill="url(#swoosh-grad)"/>
             </svg>
           </div>
 
@@ -1515,11 +1513,11 @@
               <!-- Animated search input -->
               <div style="background:#EDE9FE;border:1px solid #DDD6FE;border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:8px;font-size:.75rem;margin-bottom:8px;">
                 <span style="color:#A78BFA;">🔍</span>
-                <span style="color:#1F1A33;font-weight:600;font-family:monospace;overflow:hidden;white-space:nowrap;display:inline-block;animation:search-type 7s linear infinite;">youtube</span>
+                <span style="color:#1F1A33;font-weight:600;font-family:monospace;overflow:hidden;white-space:nowrap;display:inline-block;animation:search-type 3.5s linear infinite;">youtube</span>
                 <span style="display:inline-block;width:1.5px;height:13px;background:#8B5CF6;animation:blink 1s infinite;flex-shrink:0;"></span>
               </div>
               <!-- Results fade in after typing -->
-              <div style="background:#FAFAFE;border:1px solid #E5E0FF;border-radius:8px;overflow:hidden;animation:fade-in-results 7s ease infinite;">
+              <div style="background:#FAFAFE;border:1px solid #E5E0FF;border-radius:8px;overflow:hidden;animation:fade-in-results 3.5s ease infinite;">
                 <div style="padding:7px 12px;border-bottom:1px solid #F5F3FF;display:flex;align-items:center;gap:8px;">
                   <span style="font-size:.8rem;">▶️</span>
                   <div>
