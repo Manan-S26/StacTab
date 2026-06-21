@@ -256,28 +256,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  function safeArchive(queryOpts, filterFn) {
+    chrome.tabs.query(queryOpts, (tabs) => {
+      if (chrome.runtime.lastError) { console.error('StacTab query error:', chrome.runtime.lastError); return; }
+      const filtered = filterFn ? tabs.filter(filterFn) : tabs;
+      archiveTabs(filtered);
+    });
+  }
+
   document.getElementById('arc-current').addEventListener('click', () => {
     chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-      if (tabs[0]) archiveTabs([tabs[0]]);
+      if (chrome.runtime.lastError) { console.error('StacTab:', chrome.runtime.lastError); return; }
+      if (tabs && tabs[0]) archiveTabs([tabs[0]]);
     });
   });
   document.getElementById('arc-all').addEventListener('click', () => {
     showSessionModal((sessionName) => {
-      chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => !t.url.includes('archive.html')), sessionName));
+      chrome.tabs.query({ currentWindow: true }, (tabs) => {
+        if (chrome.runtime.lastError) { console.error('StacTab:', chrome.runtime.lastError); return; }
+        archiveTabs(tabs.filter(t => !t.url.includes('archive.html')), sessionName);
+      });
     });
   });
   document.getElementById('arc-left').addEventListener('click', () => {
     chrome.tabs.query({ currentWindow: true, active: true }, (activeTabs) => {
-      const activeTab = activeTabs[0];
+      if (chrome.runtime.lastError) { console.error('StacTab:', chrome.runtime.lastError); return; }
+      const activeTab = activeTabs && activeTabs[0];
       if (!activeTab) return;
-      chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => t.index < activeTab.index && !t.pinned && !t.url.includes('archive.html'))));
+      chrome.tabs.query({ currentWindow: true }, (tabs) => {
+        if (chrome.runtime.lastError) return;
+        archiveTabs(tabs.filter(t => t.index < activeTab.index && !t.pinned && !t.url.includes('archive.html')));
+      });
     });
   });
   document.getElementById('arc-right').addEventListener('click', () => {
     chrome.tabs.query({ currentWindow: true, active: true }, (activeTabs) => {
-      const activeTab = activeTabs[0];
+      if (chrome.runtime.lastError) { console.error('StacTab:', chrome.runtime.lastError); return; }
+      const activeTab = activeTabs && activeTabs[0];
       if (!activeTab) return;
-      chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => t.index > activeTab.index && !t.url.includes('archive.html'))));
+      chrome.tabs.query({ currentWindow: true }, (tabs) => {
+        if (chrome.runtime.lastError) return;
+        archiveTabs(tabs.filter(t => t.index > activeTab.index && !t.url.includes('archive.html')));
+      });
     });
   });
 
