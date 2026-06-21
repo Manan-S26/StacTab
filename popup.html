@@ -62,7 +62,7 @@
     .tool-bar { display: flex; background: var(--surface); border-radius: var(--radius-large); padding: 3px; border: 1px solid var(--border); margin-bottom: 10px; gap: 2px; }
     .tool-btn { flex: 1; padding: 6px 0; background: transparent; border: none; border-radius: 8px; font-size: 11px; font-weight: 500; color: var(--text-sub); cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 1px; }
     .tool-btn:hover { background: var(--bg); }
-    .tool-icon { font-size: 13px; }
+    .tool-icon { font-size: 16px; }
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; padding: 0 4px; }
     .section-title { font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
     .dash-link { font-size: 12px; font-weight: 500; color: var(--accent); text-decoration: none; cursor: pointer; transition: 0.2s; background: rgba(139, 92, 246, 0.05); padding: 4px 8px; border-radius: 6px;}
@@ -70,7 +70,7 @@
     .archive-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
     .arc-btn { background: var(--surface); border: 1px solid var(--border); padding: 8px 8px; border-radius: var(--radius-large); font-size: 11px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
     .arc-btn:hover { border-color: var(--accent); background: var(--surface-hover); }
-    .arc-icon { color: var(--text-sub); font-size: 14px; }
+    .arc-icon { color: var(--text-sub); font-size: 17px; }
     #session-modal { display: none; position: absolute; inset: 0; background: var(--surface); border-radius: var(--radius-large); padding: 20px; z-index: 200; flex-direction: column; gap: 12px; border: 1px solid var(--border); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
     .session-modal-title { font-size: 13px; font-weight: 600; color: var(--text-main); }
     .session-modal-hint { font-size: 11px; color: var(--text-sub); margin-top: -6px; }
@@ -93,7 +93,7 @@
     <div class="profile-card-row">
       <div class="brand">
         <img src="icon_v2.png" alt="Logo" id="brand-logo">
-        <div class="brand-text"><span class="brand-name">Stac Tab</span><span class="brand-status">Auto-Pilot</span></div>
+        <div class="brand-text"><span class="brand-name">StacTab</span><span class="brand-status">Auto-Pilot</span></div>
       </div>
       <label class="switch" title="Toggle Auto-Grouping"><input type="checkbox" id="toggle-auto" checked><span class="slider"></span></label>
     </div>
@@ -125,7 +125,7 @@
   </div>
   <div class="archive-grid">
     <button id="arc-current" class="arc-btn"><span class="arc-icon">⊙</span> Current tab</button>
-    <button id="arc-all" class="arc-btn"><span class="arc-icon">⊚</span> All tabs</button>
+    <button id="arc-all" class="arc-btn"><span class="arc-icon">⟷</span> All tabs</button>
     <button id="arc-left" class="arc-btn"><span class="arc-icon">⟵</span> Left tabs</button>
     <button id="arc-right" class="arc-btn"><span class="arc-icon">⟶</span> Right tabs</button>
   </div>
