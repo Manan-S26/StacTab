@@ -1395,15 +1395,27 @@
         <div>
           <p class="section-eyebrow fade-in">What is StacTab</p>
           <h2 class="section-title fade-in fade-in-delay-1">Tab chaos is a solved problem.</h2>
-          <p class="section-sub fade-in fade-in-delay-2">
+          <p class="section-sub fade-in fade-in-delay-2" style="margin-bottom:20px;">
             StacTab is a lightweight Chrome extension that brings order to your browser automatically.
-            It groups related tabs by domain, sleeps memory-hungry background tabs, zaps duplicates,
-            and gives you a searchable archive for every session you've ever worked on.
           </p>
-          <p class="section-sub fade-in fade-in-delay-3" style="margin-top:16px;">
-            Built for developers, researchers, and anyone who's ever had 40+ tabs open and lost track
-            of what they were even doing. Free, open source, and respects your privacy. No data ever leaves your browser.
+          <ul class="fade-in fade-in-delay-3" style="list-style:none;margin:0 0 24px;padding:0;display:flex;flex-direction:column;gap:14px;">
+            <li style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">⚡</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Auto-grouping:</strong> Watches your tabs in real time and groups matching domains automatically, the moment your threshold is crossed.</span>
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🔍</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Instant search:</strong> Hit <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+S</kbd> from anywhere to search every open tab by title or URL in real time.</span>
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🗄️</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Workspace Vault:</strong> Archive entire sessions and restore them anytime. Never lose a tab again.</span>
+            </li>
+          </ul>
+          <p class="section-sub fade-in fade-in-delay-3" style="margin-bottom:20px;">
+            Built for anyone who's ever had 20+ tabs open and lost track of what they were doing.
           </p>
+          <a href="#features" class="fade-in fade-in-delay-3" style="display:inline-flex;align-items:center;gap:6px;font-size:.9rem;font-weight:600;color:#8B5CF6;text-decoration:none;">See all features <span style="font-size:1.1rem;">→</span></a>
         </div>
 
         <!-- Before → After vertical visual + search -->
@@ -1428,12 +1440,12 @@
           </div>
 
           <!-- Swoosh arrow -->
-          <div style="display:flex;align-items:center;justify-content:center;padding:6px 0;gap:8px;">
-            <svg width="120" height="36" viewBox="0 0 120 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 8 C10 8, 60 2, 100 18" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="4 3" opacity=".6"/>
-              <path d="M94 12 L102 20 L106 10" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <div style="display:flex;align-items:center;justify-content:center;padding:10px 0;gap:10px;">
+            <svg width="200" height="44" viewBox="0 0 200 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 10 C20 10, 100 2, 168 28" stroke="#8B5CF6" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+              <path d="M158 18 L170 30 L176 16" stroke="#8B5CF6" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             </svg>
-            <span style="font-size:.7rem;font-weight:700;color:#8B5CF6;letter-spacing:.05em;text-transform:uppercase;">StacTab</span>
+            <span style="font-size:.72rem;font-weight:700;color:#8B5CF6;letter-spacing:.06em;text-transform:uppercase;background:rgba(139,92,246,.08);padding:3px 10px;border-radius:99px;">StacTab organises</span>
           </div>
 
           <!-- AFTER: color-coded grouped tabs -->
@@ -1485,25 +1497,6 @@
         </div>
       </div>
 
-      <!-- Bullet points + more features link -->
-      <div class="fade-in fade-in-delay-3" style="margin-top:40px;padding:28px 32px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);">
-        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;">
-          <li style="display:flex;align-items:flex-start;gap:12px;">
-            <span style="width:22px;height:22px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">⚡</span>
-            <span style="font-size:.9rem;color:var(--text);line-height:1.5;"><strong>Auto-grouping:</strong> StacTab watches your tabs in real time and groups matching domains the moment your threshold is crossed. No clicks needed.</span>
-          </li>
-          <li style="display:flex;align-items:flex-start;gap:12px;">
-            <span style="width:22px;height:22px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🔍</span>
-            <span style="font-size:.9rem;color:var(--text);line-height:1.5;"><strong>Instant search:</strong> Hit <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.8rem;font-family:monospace;">Alt+S</kbd> from anywhere to search every open tab by title or URL in real time.</span>
-          </li>
-          <li style="display:flex;align-items:flex-start;gap:12px;">
-            <span style="width:22px;height:22px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🗄️</span>
-            <span style="font-size:.9rem;color:var(--text);line-height:1.5;"><strong>Workspace Vault:</strong> Archive entire sessions and restore them anytime. Never lose a tab again.</span>
-          </li>
-        </ul>
-        <a href="#features" style="display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:.85rem;font-weight:600;color:#8B5CF6;text-decoration:none;">See all features <span style="font-size:1rem;">→</span></a>
-      </div>
-
     </div>
   </section>
 
@@ -1511,7 +1504,7 @@
   <section id="features" class="features-bg">
     <div class="container">
       <p class="section-eyebrow fade-in">Features</p>
-      <h2 class="section-title fade-in fade-in-delay-1">Everything you need.<br/>Nothing you don't.</h2>
+      <h2 class="section-title fade-in fade-in-delay-1">Everything you need,<br/><span style="color:#8B5CF6;">without the clutter.</span></h2>
       <p class="section-sub fade-in fade-in-delay-2">Every feature is designed to reduce friction, not add it. One click is always enough.</p>
 
       <div class="features-grid">
