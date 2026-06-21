@@ -1,3 +1,6 @@
+# Local scratch folder (screenshots, notes, references — never committed)
+_local/
+
 # Python virtual environment
 venv/
 .venv/
