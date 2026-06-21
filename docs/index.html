@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StacTab — Tame Your Tabs</title>
-  <meta name="description" content="StacTab is a Chrome extension that auto-groups tabs, sleeps inactive ones, dedupes, and gives you a searchable Workspace Vault — all with one click." />
+  <title>StacTab: Tame Your Tabs</title>
+  <meta name="description" content="StacTab is a Chrome extension that auto-groups tabs, sleeps inactive ones, dedupes, and gives you a searchable Workspace Vault, all with one click." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -24,6 +24,9 @@
       --text:        #1F1A33;
       --sub:         #6B628D;
       --danger:      #EF4444;
+      --green:       #10B981;
+      --red:         #EF4444;
+      --blue:        #3B82F6;
       --radius:      16px;
       --radius-sm:   10px;
       --shadow:      0 4px 24px rgba(139,92,246,.12);
@@ -68,6 +71,10 @@
       50%      { background-position: 100% 50%; }
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    @keyframes tabTyping {
+      0%,100% { width: 0; }
+      30%,70% { width: 52px; }
+    }
 
     .fade-in {
       opacity: 0;
@@ -274,156 +281,242 @@
       box-shadow: var(--shadow);
     }
 
-    /* ── CSS POPUP MOCKUP ── */
+    /* ══════════════════════════════════════
+       ACCURATE STACTAB POPUP MOCKUP
+    ══════════════════════════════════════ */
     .hero-mockup-wrap {
       position: relative; z-index: 1;
       animation: float 5s ease-in-out infinite;
-      filter: drop-shadow(0 24px 60px rgba(109,40,217,.3));
-    }
-    .popup-mockup {
-      width: min(400px, 90vw);
-      background: linear-gradient(160deg, #1E1030 0%, #130926 100%);
-      border-radius: 20px;
-      border: 1px solid rgba(139,92,246,.35);
-      overflow: hidden;
-      text-align: left;
-    }
-    .pm-topbar {
-      display: flex; align-items: center; gap: 8px;
-      padding: 14px 16px 12px;
-      border-bottom: 1px solid rgba(139,92,246,.2);
-      background: rgba(139,92,246,.08);
-    }
-    .pm-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .pm-dot-r { background: #FF5F57; }
-    .pm-dot-y { background: #FFBD2E; }
-    .pm-dot-g { background: #28C840; }
-    .pm-title {
-      margin-left: 6px;
-      font-size: .72rem;
-      font-weight: 600;
-      color: rgba(255,255,255,.5);
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .pm-badge-count {
-      margin-left: auto;
-      background: var(--purple);
-      color: #fff;
-      font-size: .65rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 99px;
+      filter: drop-shadow(0 28px 64px rgba(109,40,217,.35));
     }
 
-    /* search bar */
-    .pm-search {
-      margin: 12px 12px 8px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(139,92,246,.25);
-      border-radius: 10px;
-      padding: 8px 12px;
+    /* outer chrome frame */
+    .popup-chrome {
+      background: #2D2040;
+      border-radius: 22px;
+      border: 1.5px solid rgba(139,92,246,.4);
+      overflow: hidden;
+      width: min(380px, 92vw);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
+    }
+    .popup-chrome-bar {
+      background: #241836;
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid rgba(139,92,246,.18);
+    }
+    .pc-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .pc-dot-r { background: #FF5F57; }
+    .pc-dot-y { background: #FFBD2E; }
+    .pc-dot-g { background: #28C840; }
+    .pc-url-bar {
+      flex: 1;
+      margin-left: 10px;
+      background: rgba(255,255,255,.06);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: .62rem;
+      color: rgba(255,255,255,.3);
+      font-family: 'Menlo', monospace;
+      letter-spacing: .02em;
+    }
+
+    /* popup inner */
+    .popup-inner {
+      background: #F5F3FF;
+      padding: 0;
+    }
+
+    /* top card: brand + toggle + group-at */
+    .pmi-top-card {
+      background: #fff;
+      border-bottom: 1px solid #E5E0FF;
+      padding: 12px 14px 10px;
+    }
+    .pmi-brand-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 10px;
+    }
+    .pmi-logo-icon {
+      width: 24px; height: 24px;
+      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem;
+      flex-shrink: 0;
+    }
+    .pmi-brand-name {
+      font-size: .92rem;
+      font-weight: 700;
+      color: #1F1A33;
+      letter-spacing: -.3px;
+    }
+    .pmi-autopilot-label {
+      font-size: .65rem;
+      color: #8B5CF6;
+      font-weight: 600;
+      background: rgba(139,92,246,.1);
+      padding: 2px 7px;
+      border-radius: 99px;
+      margin-left: 2px;
+    }
+    .pmi-toggle {
+      margin-left: auto;
+      width: 34px; height: 18px;
+      background: #8B5CF6;
+      border-radius: 99px;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 2px rgba(139,92,246,.25);
+    }
+    .pmi-toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px; right: 2px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+
+    /* group-at row */
+    .pmi-groupat-row {
       display: flex; align-items: center; gap: 8px;
     }
-    .pm-search-icon { color: rgba(255,255,255,.3); font-size: .8rem; }
-    .pm-search-text { font-size: .75rem; color: rgba(255,255,255,.25); }
-    .pm-cursor {
-      width: 1.5px; height: 12px;
-      background: var(--purple-light);
+    .pmi-groupat-label {
+      font-size: .68rem;
+      color: #6B628D;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .pmi-num-btns {
+      display: flex; gap: 4px;
+    }
+    .pmi-num-btn {
+      width: 24px; height: 22px;
+      border-radius: 6px;
+      background: #F0EBFF;
+      border: 1px solid #DDD6FE;
+      font-size: .68rem;
+      font-weight: 700;
+      color: #6B628D;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pmi-num-btn.active {
+      background: #8B5CF6;
+      border-color: #8B5CF6;
+      color: #fff;
+    }
+    .pmi-tabs-label {
+      font-size: .68rem;
+      color: #6B628D;
+      font-weight: 500;
+    }
+
+    /* search */
+    .pmi-search {
+      margin: 10px 10px 8px;
+      background: #fff;
+      border: 1.5px solid #DDD6FE;
+      border-radius: 9px;
+      padding: 7px 10px;
+      display: flex; align-items: center; gap: 7px;
+      box-shadow: 0 1px 4px rgba(139,92,246,.07);
+    }
+    .pmi-search-icon { color: #A78BFA; font-size: .78rem; }
+    .pmi-search-text { font-size: .72rem; color: #B0A8C8; }
+    .pmi-cursor {
+      width: 1.5px; height: 11px;
+      background: #8B5CF6;
       animation: blink 1s step-end infinite;
     }
 
-    /* quick actions */
-    .pm-actions {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 6px; padding: 0 12px 10px;
+    /* main organize button */
+    .pmi-organize-btn {
+      margin: 0 10px 8px;
+      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+      color: #fff;
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: .72rem;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: .01em;
+      box-shadow: 0 2px 12px rgba(139,92,246,.35);
     }
-    .pm-action-btn {
-      background: rgba(139,92,246,.12);
-      border: 1px solid rgba(139,92,246,.2);
-      border-radius: 8px;
-      padding: 8px 10px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .pm-action-icon { font-size: .85rem; }
-    .pm-action-label { font-size: .67rem; font-weight: 600; color: rgba(255,255,255,.7); }
-    .pm-action-btn:nth-child(1) .pm-action-icon { color: #A78BFA; }
-    .pm-action-btn:nth-child(2) .pm-action-icon { color: #34D399; }
-    .pm-action-btn:nth-child(3) .pm-action-icon { color: #60A5FA; }
-    .pm-action-btn:nth-child(4) .pm-action-icon { color: #F59E0B; }
 
-    /* tab groups */
-    .pm-section-label {
-      font-size: .6rem;
-      font-weight: 700;
-      color: rgba(255,255,255,.3);
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: 0 12px 6px;
+    /* tool bar */
+    .pmi-toolbar {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 5px; margin: 0 10px 10px;
     }
-    .pm-group {
-      margin: 0 12px 8px;
+    .pmi-tool-btn {
+      background: #fff;
+      border: 1px solid #E5E0FF;
       border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,.06);
+      padding: 7px 4px;
+      font-size: .6rem;
+      font-weight: 600;
+      color: #6B628D;
+      text-align: center;
+      line-height: 1.3;
     }
-    .pm-group-header {
-      display: flex; align-items: center; gap: 7px;
-      padding: 6px 10px;
-      font-size: .68rem;
+
+    /* archive section */
+    .pmi-section-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 10px 5px;
+    }
+    .pmi-section-label {
+      font-size: .58rem;
       font-weight: 700;
+      color: #B0A8C8;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .pmi-vault-link {
+      font-size: .58rem;
+      font-weight: 700;
+      color: #8B5CF6;
       letter-spacing: .02em;
     }
-    .pm-group-dot { width: 7px; height: 7px; border-radius: 50%; }
-    .pm-group-count {
-      margin-left: auto;
-      font-size: .6rem;
-      opacity: .5;
+    .pmi-archive-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5px; margin: 0 10px 10px;
     }
-    .pm-tab {
-      padding: 5px 10px 5px 24px;
-      font-size: .65rem;
-      color: rgba(255,255,255,.45);
-      border-top: 1px solid rgba(255,255,255,.04);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-
-    /* group 1 – github */
-    .pm-group-1 .pm-group-header { background: rgba(110,231,183,.1); color: #6EE7B7; }
-    .pm-group-1 .pm-group-dot   { background: #6EE7B7; }
-    .pm-group-1 .pm-group-header,
-    .pm-group-1 .pm-tab         { background: rgba(110,231,183,.04); }
-
-    /* group 2 – docs */
-    .pm-group-2 .pm-group-header { background: rgba(96,165,250,.1); color: #93C5FD; }
-    .pm-group-2 .pm-group-dot   { background: #60A5FA; }
-    .pm-group-2 .pm-group-header,
-    .pm-group-2 .pm-tab         { background: rgba(96,165,250,.04); }
-
-    /* group 3 – youtube */
-    .pm-group-3 .pm-group-header { background: rgba(248,113,113,.1); color: #FCA5A5; }
-    .pm-group-3 .pm-group-dot   { background: #F87171; }
-    .pm-group-3 .pm-group-header,
-    .pm-group-3 .pm-tab         { background: rgba(248,113,113,.04); }
-
-    .pm-footer {
-      padding: 10px 12px;
-      border-top: 1px solid rgba(139,92,246,.12);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .pm-footer-link {
+    .pmi-archive-btn {
+      background: #fff;
+      border: 1px solid #E5E0FF;
+      border-radius: 8px;
+      padding: 7px 8px;
       font-size: .62rem;
-      color: rgba(139,92,246,.7);
       font-weight: 600;
-      letter-spacing: .03em;
+      color: #4C1D95;
+      text-align: center;
     }
-    .pm-footer-dots { display: flex; gap: 4px; }
-    .pm-footer-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: rgba(139,92,246,.3);
+
+    /* tab groups */
+    .pmi-groups-section {
+      padding: 0 10px 12px;
     }
-    .pm-footer-dot.active { background: var(--purple); }
+    .pmi-group-row {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 0;
+      border-bottom: 1px solid #F0EBFF;
+    }
+    .pmi-group-row:last-child { border-bottom: none; }
+    .pmi-group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .pmi-group-name { font-size: .7rem; font-weight: 700; color: #1F1A33; flex: 1; }
+    .pmi-group-count { font-size: .6rem; color: #B0A8C8; margin-right: 4px; }
+    .pmi-split-btn {
+      font-size: .58rem;
+      font-weight: 700;
+      color: #8B5CF6;
+      background: rgba(139,92,246,.09);
+      border: 1px solid rgba(139,92,246,.2);
+      border-radius: 5px;
+      padding: 2px 7px;
+    }
 
     /* ── SECTION WRAPPER ── */
     section { padding: clamp(64px, 10vw, 120px) clamp(20px, 6vw, 80px); }
@@ -468,34 +561,98 @@
       align-items: center;
       margin-top: 60px;
     }
-    .what-stat-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+
+    /* before/after tab visual */
+    .tab-compare-wrap {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
     }
-    .stat-card {
+    .tab-compare-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px 24px;
+      overflow: hidden;
       box-shadow: var(--shadow);
       transition: transform .25s, box-shadow .25s;
     }
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
+    .tab-compare-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .tcc-header {
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .stat-number {
-      font-size: 2.4rem;
-      font-weight: 900;
+    .tcc-badge {
+      font-size: .6rem;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 99px;
+    }
+    .tcc-badge-before {
+      background: #F3F4F6;
+      color: #6B7280;
+    }
+    .tcc-badge-after {
+      background: rgba(139,92,246,.12);
       color: var(--purple);
-      letter-spacing: -2px;
-      line-height: 1;
-      margin-bottom: 6px;
     }
-    .stat-label {
-      font-size: .8rem;
-      color: var(--sub);
-      font-weight: 500;
+    .tcc-dots { display: flex; gap: 4px; }
+    .tcc-dot { width: 8px; height: 8px; border-radius: 50%; background: #D1D5DB; }
+
+    /* before: crowded monochrome tabs */
+    .tcc-tabs-before {
+      padding: 10px 10px 8px;
+      display: flex; flex-wrap: wrap; gap: 3px;
     }
+    .tcc-tab-strip {
+      height: 16px;
+      background: #E5E7EB;
+      border-radius: 4px 4px 0 0;
+      border: 1px solid #D1D5DB;
+      border-bottom: none;
+    }
+
+    /* after: grouped with colors */
+    .tcc-tabs-after {
+      padding: 10px 10px 8px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .tcc-group {
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .tcc-group-label {
+      font-size: .58rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .tcc-group-tabs {
+      display: flex; gap: 2px; padding: 4px 6px;
+    }
+    .tcc-group-tab {
+      height: 13px;
+      border-radius: 3px;
+      opacity: .7;
+    }
+    /* group colors */
+    .tcc-group-gh  .tcc-group-label { background: rgba(16,185,129,.18); color: #059669; }
+    .tcc-group-gh  .tcc-group-tabs  { background: rgba(16,185,129,.07); }
+    .tcc-group-gh  .tcc-group-tab   { background: #10B981; }
+
+    .tcc-group-gm  .tcc-group-label { background: rgba(239,68,68,.15); color: #DC2626; }
+    .tcc-group-gm  .tcc-group-tabs  { background: rgba(239,68,68,.06); }
+    .tcc-group-gm  .tcc-group-tab   { background: #EF4444; }
+
+    .tcc-group-dc  .tcc-group-label { background: rgba(59,130,246,.15); color: #2563EB; }
+    .tcc-group-dc  .tcc-group-tabs  { background: rgba(59,130,246,.06); }
+    .tcc-group-dc  .tcc-group-tab   { background: #3B82F6; }
+
+    .tcc-group-yt  .tcc-group-label { background: rgba(139,92,246,.13); color: #7C3AED; }
+    .tcc-group-yt  .tcc-group-tabs  { background: rgba(139,92,246,.05); }
+    .tcc-group-yt  .tcc-group-tab   { background: #8B5CF6; }
 
     /* ── FEATURES GRID ── */
     .features-bg { background: var(--surface); }
@@ -557,6 +714,80 @@
       padding: 3px 9px;
       border-radius: 99px;
     }
+
+    /* feature visual extras */
+    .feature-visual {
+      margin-top: 16px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    /* tab grouping visual (feature card) */
+    .fv-tab-bar {
+      background: #F9FAFB;
+      padding: 6px 8px 0;
+      display: flex; gap: 3px; align-items: flex-end;
+      border-bottom: 2px solid #E5E7EB;
+    }
+    .fv-tab {
+      padding: 4px 8px;
+      border-radius: 5px 5px 0 0;
+      font-size: .56rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60px;
+      border: 1px solid transparent;
+      border-bottom: none;
+    }
+    .fv-tab-grey {
+      background: #E5E7EB;
+      color: #9CA3AF;
+      border-color: #D1D5DB;
+    }
+    .fv-tab-green  { background: rgba(16,185,129,.15); color: #059669; border-color: rgba(16,185,129,.3); }
+    .fv-tab-red    { background: rgba(239,68,68,.12);  color: #DC2626; border-color: rgba(239,68,68,.25); }
+    .fv-tab-blue   { background: rgba(59,130,246,.13); color: #2563EB; border-color: rgba(59,130,246,.28); }
+    .fv-tab-purple { background: rgba(139,92,246,.13); color: #7C3AED; border-color: rgba(139,92,246,.28); }
+
+    /* search visual */
+    .fv-search-wrap {
+      background: #fff;
+      padding: 10px;
+    }
+    .fv-search-bar {
+      background: #F5F3FF;
+      border: 1.5px solid #DDD6FE;
+      border-radius: 8px;
+      padding: 7px 10px;
+      display: flex; align-items: center; gap: 7px;
+      margin-bottom: 7px;
+    }
+    .fv-search-icon { color: #A78BFA; font-size: .8rem; }
+    .fv-search-typed {
+      font-size: .7rem;
+      color: #1F1A33;
+      font-weight: 500;
+    }
+    .fv-search-result {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 7px;
+      border-radius: 6px;
+      margin-bottom: 3px;
+      background: #F5F3FF;
+      border: 1px solid #E5E0FF;
+    }
+    .fv-result-icon { font-size: .75rem; }
+    .fv-result-title {
+      font-size: .65rem;
+      font-weight: 600;
+      color: #1F1A33;
+      flex: 1;
+    }
+    .fv-result-url { font-size: .58rem; color: #B0A8C8; }
+    .fv-highlight { color: #7C3AED; background: rgba(139,92,246,.12); border-radius: 2px; padding: 0 2px; }
 
     /* ── VAULT SECTION ── */
     .vault-bg {
@@ -621,95 +852,115 @@
       line-height: 1.5;
     }
 
-    /* vault UI mockup */
-    .vault-mockup {
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(139,92,246,.25);
+    /* ── VAULT UI MOCKUP (detailed) ── */
+    .vault-mockup-v2 {
+      background: #16102A;
+      border: 1px solid rgba(139,92,246,.3);
       border-radius: 18px;
       overflow: hidden;
-      backdrop-filter: blur(10px);
     }
-    .vm-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid rgba(139,92,246,.15);
-      display: flex; align-items: center; gap: 10px;
-      background: rgba(139,92,246,.07);
-    }
-    .vm-header-title {
-      font-size: .8rem;
-      font-weight: 700;
-      color: rgba(255,255,255,.8);
+    .vm2-topbar {
+      background: #1F1540;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(139,92,246,.18);
       display: flex; align-items: center; gap: 8px;
     }
-    .vm-header-badge {
-      font-size: .6rem;
-      background: var(--purple);
-      color: #fff;
-      padding: 2px 7px;
+    .vm2-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .vm2-dot-r { background: #FF5F57; }
+    .vm2-dot-y { background: #FFBD2E; }
+    .vm2-dot-g { background: #28C840; }
+    .vm2-page-title {
+      margin-left: 8px;
+      font-size: .7rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .04em;
+    }
+    .vm2-badge {
+      margin-left: auto;
+      background: rgba(139,92,246,.3);
+      color: #C4B5FD;
+      font-size: .58rem;
+      font-weight: 700;
+      padding: 2px 8px;
       border-radius: 99px;
-      font-weight: 700;
+      letter-spacing: .04em;
     }
-    .vm-search-bar {
-      margin: 12px 14px;
+    .vm2-search {
+      margin: 10px 12px 8px;
       background: rgba(255,255,255,.06);
-      border: 1px solid rgba(139,92,246,.2);
+      border: 1px solid rgba(139,92,246,.22);
       border-radius: 8px;
-      padding: 7px 12px;
-      font-size: .72rem;
-      color: rgba(255,255,255,.3);
+      padding: 7px 11px;
       display: flex; align-items: center; gap: 8px;
+      font-size: .7rem;
+      color: rgba(255,255,255,.28);
     }
-    .vm-sessions { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
-    .vm-session {
+    .vm2-body { padding: 0 12px 12px; }
+
+    .vm2-date-label {
+      font-size: .58rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.28);
+      padding: 6px 0 4px;
+    }
+    .vm2-session-card {
+      background: rgba(139,92,246,.1);
+      border: 1px solid rgba(139,92,246,.22);
       border-radius: 10px;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.07);
+      margin-bottom: 8px;
     }
-    .vm-session-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
+    .vm2-session-title-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px;
+      background: rgba(139,92,246,.14);
     }
-    .vm-session-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .vm-session-name { font-size: .75rem; font-weight: 700; color: rgba(255,255,255,.8); }
-    .vm-session-meta { margin-left: auto; font-size: .62rem; color: rgba(255,255,255,.3); }
-    .vm-session-tabs { padding: 0 14px 10px 36px; display: flex; flex-direction: column; gap: 5px; }
-    .vm-tab-row { font-size: .65rem; color: rgba(255,255,255,.35); padding: 4px 0; border-top: 1px solid rgba(255,255,255,.04); }
-    .vm-tab-row:first-child { border-top: none; }
-
-    .vm-s1 .vm-session-header { background: rgba(139,92,246,.12); }
-    .vm-s1 .vm-session-dot { background: #A78BFA; }
-    .vm-s1 .vm-session-tabs { background: rgba(139,92,246,.05); }
-
-    .vm-s2 .vm-session-header { background: rgba(52,211,153,.08); }
-    .vm-s2 .vm-session-dot { background: #34D399; }
-    .vm-s2 .vm-session-tabs { background: rgba(52,211,153,.03); }
-
-    .vm-s3 .vm-session-header { background: rgba(96,165,250,.08); }
-    .vm-s3 .vm-session-dot { background: #60A5FA; }
-
-    .vm-footer-actions {
-      padding: 10px 14px;
-      border-top: 1px solid rgba(139,92,246,.12);
-      display: flex; gap: 8px;
+    .vm2-session-icon { font-size: .8rem; }
+    .vm2-session-name { font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.85); flex: 1; }
+    .vm2-session-count { font-size: .6rem; color: rgba(255,255,255,.35); }
+    .vm2-session-actions {
+      display: flex; gap: 5px; padding: 7px 10px;
+      border-top: 1px solid rgba(139,92,246,.15);
+      background: rgba(139,92,246,.06);
     }
-    .vm-footer-btn {
-      flex: 1;
-      padding: 7px 10px;
-      font-size: .65rem;
+    .vm2-action-btn {
+      font-size: .58rem;
       font-weight: 700;
-      border-radius: 7px;
-      text-align: center;
+      padding: 3px 9px;
+      border-radius: 5px;
       color: rgba(255,255,255,.5);
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.08);
-      letter-spacing: .03em;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
     }
-    .vm-footer-btn.primary {
-      background: rgba(139,92,246,.2);
-      border-color: rgba(139,92,246,.35);
-      color: var(--purple-light);
+    .vm2-action-btn.restore {
+      background: rgba(139,92,246,.22);
+      border-color: rgba(139,92,246,.4);
+      color: #C4B5FD;
     }
+    .vm2-domain-group {
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .vm2-domain-group:last-child { border-bottom: none; }
+    .vm2-domain-label {
+      font-size: .6rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.4);
+      margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .vm2-domain-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .vm2-tab-item {
+      padding: 3px 0 3px 14px;
+      font-size: .62rem;
+      color: rgba(255,255,255,.3);
+      border-top: 1px solid rgba(255,255,255,.04);
+    }
+    .vm2-tab-item:first-of-type { border-top: none; }
+    .vm2-tab-url { font-size: .55rem; color: rgba(255,255,255,.18); }
 
     /* ── INSTALL SECTION ── */
     .install-grid {
@@ -719,6 +970,71 @@
       align-items: start;
       margin-top: 60px;
     }
+
+    /* Install option cards */
+    .install-options {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .install-option-card {
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .install-option-card:hover { transform: translateY(-3px); }
+    .ioc-label {
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ioc-title {
+      font-size: .95rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: -.3px;
+    }
+    .ioc-desc {
+      font-size: .75rem;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    /* Option A: primary filled */
+    .ioc-a {
+      background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(139,92,246,.4);
+    }
+    .ioc-a .ioc-label { color: rgba(255,255,255,.7); }
+    .ioc-a .ioc-desc { color: rgba(255,255,255,.7); }
+    .ioc-download-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: #fff;
+      color: var(--purple-dark);
+      font-size: .78rem;
+      font-weight: 800;
+      padding: 9px 16px;
+      border-radius: 99px;
+      text-decoration: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,.15);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .ioc-download-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+
+    /* Option B: outlined secondary */
+    .ioc-b {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+    .ioc-b .ioc-label { color: var(--purple); }
+    .ioc-b .ioc-desc { color: var(--sub); }
+
     .install-steps { display: flex; flex-direction: column; gap: 0; }
     .install-step {
       display: flex; gap: 18px;
@@ -745,13 +1061,25 @@
     }
     .step-content p { font-size: .85rem; color: var(--sub); line-height: 1.6; }
 
+    .install-success {
+      margin-top: 22px;
+      background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.25);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .install-success-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .install-success-text { font-size: .82rem; color: #065F46; line-height: 1.6; }
+    .install-success-text strong { color: #047857; font-weight: 700; }
+
     /* code block */
     .code-block {
       background: #0F0720;
       border: 1px solid rgba(139,92,246,.25);
       border-radius: var(--radius);
       overflow: hidden;
-      margin-top: 20px;
+      margin-top: 0;
     }
     .code-block-header {
       display: flex; align-items: center; gap: 6px;
@@ -782,7 +1110,7 @@
     .code-flag { color: #F59E0B; }
 
     .install-tip {
-      margin-top: 28px;
+      margin-top: 16px;
       background: rgba(139,92,246,.06);
       border: 1px solid rgba(139,92,246,.18);
       border-radius: var(--radius-sm);
@@ -792,49 +1120,6 @@
     .install-tip-icon { font-size: 1.1rem; flex-shrink: 0; }
     .install-tip-text { font-size: .82rem; color: var(--sub); line-height: 1.6; }
     .install-tip-text strong { color: var(--purple); font-weight: 700; }
-
-    /* ── TESTIMONIALS / HIGHLIGHTS ── */
-    .highlights-bg { background: var(--surface); }
-    .highlights-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-top: 60px;
-    }
-    .highlight-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      position: relative;
-      transition: transform .25s, box-shadow .25s;
-    }
-    .highlight-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-    .highlight-quote {
-      font-size: 1.5rem;
-      line-height: 1.1;
-      margin-bottom: 4px;
-      color: var(--purple);
-      font-weight: 800;
-    }
-    .highlight-text {
-      font-size: .88rem;
-      color: var(--sub);
-      line-height: 1.65;
-      margin-bottom: 20px;
-    }
-    .highlight-author {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .highlight-avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-    .highlight-name { font-size: .82rem; font-weight: 700; }
-    .highlight-handle { font-size: .72rem; color: var(--sub); }
 
     /* ── FOOTER ── */
     footer {
@@ -917,10 +1202,6 @@
     .footer-bottom-text a:hover { text-decoration: underline; }
     .footer-heart { color: var(--danger); }
 
-    /* ── DIVIDER WAVE ── */
-    .wave-divider { line-height: 0; margin-bottom: -2px; }
-    .wave-divider svg { display: block; width: 100%; }
-
     /* ── KEYBOARD SHORTCUT BADGE ── */
     .kbd {
       display: inline-flex; align-items: center; gap: 3px;
@@ -942,18 +1223,18 @@
     @media (max-width: 768px) {
       .nav-links li:not(:last-child) { display: none; }
       .what-grid { grid-template-columns: 1fr; }
+      .tab-compare-wrap { grid-template-columns: 1fr 1fr; }
       .vault-inner { grid-template-columns: 1fr; }
       .install-grid { grid-template-columns: 1fr; }
-      .highlights-grid { grid-template-columns: 1fr; }
+      .install-options { grid-template-columns: 1fr; }
       .footer-inner { grid-template-columns: 1fr; gap: 32px; }
       .footer-bottom { flex-direction: column; align-items: flex-start; }
-      .pm-actions { grid-template-columns: 1fr 1fr; }
       .hero-headline { letter-spacing: -1.5px; }
-      .what-stat-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 500px) {
       .hero-cta-row { flex-direction: column; align-items: center; }
       .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+      .tab-compare-wrap { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -996,7 +1277,7 @@
     </h1>
 
     <p class="hero-sub fade-in fade-in-delay-2">
-      StacTab automatically groups, sleeps, deduplicates, and archives your tabs —
+      StacTab automatically groups, sleeps, deduplicates, and archives your tabs
       so you can stop drowning in them and start focusing on what matters.
     </p>
 
@@ -1011,87 +1292,96 @@
       </a>
     </div>
 
-    <!-- CSS POPUP MOCKUP -->
+    <!-- ACCURATE STACTAB POPUP MOCKUP -->
     <div class="hero-mockup-wrap fade-in fade-in-delay-4">
-      <div class="popup-mockup">
-        <!-- topbar -->
-        <div class="pm-topbar">
-          <div class="pm-dot pm-dot-r"></div>
-          <div class="pm-dot pm-dot-y"></div>
-          <div class="pm-dot pm-dot-g"></div>
-          <span class="pm-title">StacTab</span>
-          <span class="pm-badge-count">23 tabs</span>
+      <div class="popup-chrome">
+        <!-- browser chrome bar -->
+        <div class="popup-chrome-bar">
+          <div class="pc-dot pc-dot-r"></div>
+          <div class="pc-dot pc-dot-y"></div>
+          <div class="pc-dot pc-dot-g"></div>
+          <div class="pc-url-bar">chrome-extension://stactab/popup.html</div>
         </div>
 
-        <!-- search -->
-        <div class="pm-search">
-          <span class="pm-search-icon">🔍</span>
-          <span class="pm-search-text">Search tabs...</span>
-          <div class="pm-cursor"></div>
-        </div>
+        <!-- popup content -->
+        <div class="popup-inner">
 
-        <!-- quick actions -->
-        <div class="pm-actions">
-          <div class="pm-action-btn">
-            <span class="pm-action-icon">⚡</span>
-            <span class="pm-action-label">Auto-Pilot</span>
+          <!-- top card: brand + toggle + group-at -->
+          <div class="pmi-top-card">
+            <div class="pmi-brand-row">
+              <div class="pmi-logo-icon">🗂️</div>
+              <span class="pmi-brand-name">StacTab</span>
+              <span class="pmi-autopilot-label">Auto-Pilot</span>
+              <div class="pmi-toggle"></div>
+            </div>
+            <div class="pmi-groupat-row">
+              <span class="pmi-groupat-label">Group at</span>
+              <div class="pmi-num-btns">
+                <div class="pmi-num-btn active">2</div>
+                <div class="pmi-num-btn">3</div>
+                <div class="pmi-num-btn">4</div>
+                <div class="pmi-num-btn">5</div>
+              </div>
+              <span class="pmi-tabs-label">+ tabs</span>
+            </div>
           </div>
-          <div class="pm-action-btn">
-            <span class="pm-action-icon">💤</span>
-            <span class="pm-action-label">Sleep Tabs</span>
-          </div>
-          <div class="pm-action-btn">
-            <span class="pm-action-icon">🗂️</span>
-            <span class="pm-action-label">Organize</span>
-          </div>
-          <div class="pm-action-btn">
-            <span class="pm-action-icon">🗄️</span>
-            <span class="pm-action-label">Vault</span>
-          </div>
-        </div>
 
-        <!-- tab groups -->
-        <div class="pm-section-label">Open Groups</div>
-
-        <div class="pm-group pm-group-1">
-          <div class="pm-group-header">
-            <div class="pm-group-dot"></div>
-            github.com
-            <span class="pm-group-count">4 tabs</span>
+          <!-- search bar -->
+          <div class="pmi-search">
+            <span class="pmi-search-icon">🔍</span>
+            <span class="pmi-search-text">Search tabs... (Alt+S)</span>
+            <div class="pmi-cursor"></div>
           </div>
-          <div class="pm-tab">MananSharma26/StacTab · Pull requests</div>
-          <div class="pm-tab">Explore · GitHub</div>
-          <div class="pm-tab">Actions · workflow runs</div>
-        </div>
 
-        <div class="pm-group pm-group-2">
-          <div class="pm-group-header">
-            <div class="pm-group-dot"></div>
-            docs.google.com
-            <span class="pm-group-count">3 tabs</span>
-          </div>
-          <div class="pm-tab">Q3 Strategy — Google Docs</div>
-          <div class="pm-tab">Budget 2025 — Google Sheets</div>
-        </div>
+          <!-- organize button -->
+          <div class="pmi-organize-btn">✦ Organize tabs into groups</div>
 
-        <div class="pm-group pm-group-3">
-          <div class="pm-group-header">
-            <div class="pm-group-dot"></div>
-            youtube.com
-            <span class="pm-group-count">2 tabs</span>
+          <!-- tool bar -->
+          <div class="pmi-toolbar">
+            <div class="pmi-tool-btn">☾ Sleep tabs</div>
+            <div class="pmi-tool-btn">⦻ Dedupe tabs</div>
+            <div class="pmi-tool-btn">⊞ Merge windows</div>
           </div>
-          <div class="pm-tab">Lo-fi hip hop radio — YouTube</div>
-        </div>
 
-        <div class="pm-footer">
-          <span class="pm-footer-link">📦 Open Vault →</span>
-          <div class="pm-footer-dots">
-            <div class="pm-footer-dot active"></div>
-            <div class="pm-footer-dot"></div>
-            <div class="pm-footer-dot"></div>
+          <!-- archive section -->
+          <div class="pmi-section-hdr">
+            <span class="pmi-section-label">Archive Tabs</span>
+            <span class="pmi-vault-link">View Vault ↗</span>
           </div>
-        </div>
-      </div>
+          <div class="pmi-archive-grid">
+            <div class="pmi-archive-btn">⊙ Current tab</div>
+            <div class="pmi-archive-btn">⟷ All tabs</div>
+            <div class="pmi-archive-btn">⟵ Left tabs</div>
+            <div class="pmi-archive-btn">⟶ Right tabs</div>
+          </div>
+
+          <!-- tab groups -->
+          <div class="pmi-section-hdr">
+            <span class="pmi-section-label">Tab Groups</span>
+          </div>
+          <div class="pmi-groups-section">
+            <div class="pmi-group-row">
+              <div class="pmi-group-dot" style="background:#10B981;"></div>
+              <span class="pmi-group-name">GitHub</span>
+              <span class="pmi-group-count">4 tabs</span>
+              <div class="pmi-split-btn">Split</div>
+            </div>
+            <div class="pmi-group-row">
+              <div class="pmi-group-dot" style="background:#EF4444;"></div>
+              <span class="pmi-group-name">Gmail</span>
+              <span class="pmi-group-count">2 tabs</span>
+              <div class="pmi-split-btn">Split</div>
+            </div>
+            <div class="pmi-group-row">
+              <div class="pmi-group-dot" style="background:#3B82F6;"></div>
+              <span class="pmi-group-name">Docs</span>
+              <span class="pmi-group-count">3 tabs</span>
+              <div class="pmi-split-btn">Split</div>
+            </div>
+          </div>
+
+        </div><!-- /popup-inner -->
+      </div><!-- /popup-chrome -->
     </div>
   </section>
 
@@ -1109,26 +1399,83 @@
           </p>
           <p class="section-sub fade-in fade-in-delay-3" style="margin-top:16px;">
             Built for developers, researchers, and anyone who's ever had 40+ tabs open and lost track
-            of what they were even doing. Free, open source, and respects your privacy — no data ever leaves your browser.
+            of what they were even doing. Free, open source, and respects your privacy. No data ever leaves your browser.
           </p>
         </div>
-        <div class="what-stat-grid">
-          <div class="stat-card fade-in fade-in-delay-1">
-            <div class="stat-number">8</div>
-            <div class="stat-label">Powerful features in one extension</div>
+
+        <!-- Before / After tab visual -->
+        <div class="tab-compare-wrap">
+
+          <div class="tab-compare-card fade-in fade-in-delay-1">
+            <div class="tcc-header">
+              <span class="tcc-badge tcc-badge-before">Before</span>
+              <div class="tcc-dots">
+                <div class="tcc-dot"></div>
+                <div class="tcc-dot"></div>
+                <div class="tcc-dot"></div>
+              </div>
+            </div>
+            <div class="tcc-tabs-before">
+              <div class="tcc-tab-strip" style="width:34px;"></div>
+              <div class="tcc-tab-strip" style="width:28px;"></div>
+              <div class="tcc-tab-strip" style="width:32px;"></div>
+              <div class="tcc-tab-strip" style="width:26px;"></div>
+              <div class="tcc-tab-strip" style="width:30px;"></div>
+              <div class="tcc-tab-strip" style="width:24px;"></div>
+              <div class="tcc-tab-strip" style="width:28px;"></div>
+              <div class="tcc-tab-strip" style="width:22px;"></div>
+              <div class="tcc-tab-strip" style="width:30px;"></div>
+              <div class="tcc-tab-strip" style="width:26px;"></div>
+              <div class="tcc-tab-strip" style="width:24px;"></div>
+              <div class="tcc-tab-strip" style="width:32px;"></div>
+            </div>
+            <div style="padding:8px 10px 10px; font-size:.62rem; color:#9CA3AF; font-weight:500;">
+              12 unlabeled tabs, no context
+            </div>
           </div>
-          <div class="stat-card fade-in fade-in-delay-2">
-            <div class="stat-number">0</div>
-            <div class="stat-label">Data sent to any server — ever</div>
+
+          <div class="tab-compare-card fade-in fade-in-delay-2">
+            <div class="tcc-header">
+              <span class="tcc-badge tcc-badge-after">After</span>
+              <div class="tcc-dots">
+                <div class="tcc-dot" style="background:#10B981;"></div>
+                <div class="tcc-dot" style="background:#EF4444;"></div>
+                <div class="tcc-dot" style="background:#3B82F6;"></div>
+              </div>
+            </div>
+            <div class="tcc-tabs-after">
+              <div class="tcc-group tcc-group-gh">
+                <div class="tcc-group-label">
+                  <span>●</span> GitHub
+                </div>
+                <div class="tcc-group-tabs">
+                  <div class="tcc-group-tab" style="width:36px;"></div>
+                  <div class="tcc-group-tab" style="width:28px;"></div>
+                  <div class="tcc-group-tab" style="width:32px;"></div>
+                </div>
+              </div>
+              <div class="tcc-group tcc-group-gm">
+                <div class="tcc-group-label">
+                  <span>●</span> Gmail
+                </div>
+                <div class="tcc-group-tabs">
+                  <div class="tcc-group-tab" style="width:30px;"></div>
+                  <div class="tcc-group-tab" style="width:24px;"></div>
+                </div>
+              </div>
+              <div class="tcc-group tcc-group-dc">
+                <div class="tcc-group-label">
+                  <span>●</span> Docs
+                </div>
+                <div class="tcc-group-tabs">
+                  <div class="tcc-group-tab" style="width:34px;"></div>
+                  <div class="tcc-group-tab" style="width:26px;"></div>
+                  <div class="tcc-group-tab" style="width:30px;"></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="stat-card fade-in fade-in-delay-3">
-            <div class="stat-number">1</div>
-            <div class="stat-label">Keyboard shortcut to rule them all</div>
-          </div>
-          <div class="stat-card fade-in fade-in-delay-4">
-            <div class="stat-number">∞</div>
-            <div class="stat-label">Sessions you can archive &amp; restore</div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -1148,8 +1495,8 @@
           <div class="feature-title">Auto-Pilot Mode</div>
           <div class="feature-desc">
             Set it and forget it. StacTab watches your tabs in real time and automatically
-            groups tabs from the same domain and applies color-coding the moment your
-            configurable threshold (2–5 tabs) is crossed.
+            groups tabs from the same domain with color-coding the moment your
+            configurable threshold (2 to 5 tabs) is crossed.
           </div>
           <span class="feature-tag">Automatic</span>
         </div>
@@ -1161,6 +1508,18 @@
             One click groups all open tabs by domain into named, color-coded Chrome tab groups.
             Perfect when you've been browsing freely and want to instantly bring order to chaos.
           </div>
+          <!-- browser tab bar visual: before grouped vs after grouped -->
+          <div class="feature-visual">
+            <div style="background:#F0F1F3; padding:5px 7px 0; display:flex; gap:2px; align-items:flex-end; border-bottom:2px solid #D1D5DB;">
+              <div class="fv-tab fv-tab-green">GitHub</div>
+              <div class="fv-tab fv-tab-green" style="opacity:.6;">Issues</div>
+              <div class="fv-tab fv-tab-red">Gmail</div>
+              <div class="fv-tab fv-tab-blue">Docs</div>
+              <div class="fv-tab fv-tab-blue" style="opacity:.65;">Sheet</div>
+              <div class="fv-tab fv-tab-purple">YT</div>
+            </div>
+            <div style="background:#fff;padding:6px 9px;font-size:.58rem;color:#9CA3AF;font-weight:500;">Tabs auto-organized by domain</div>
+          </div>
           <span class="feature-tag">One Click</span>
         </div>
 
@@ -1169,7 +1528,7 @@
           <div class="feature-title">Sleep Tabs</div>
           <div class="feature-desc">
             Unloads inactive background tabs from RAM without closing them.
-            Your tabs stay in the tab bar — they just stop consuming memory
+            Your tabs stay in the tab bar, freeing up memory
             until you click on them again. Reclaim hundreds of megabytes instantly.
           </div>
           <span class="feature-tag">Memory Saver</span>
@@ -1191,7 +1550,7 @@
           <div class="feature-title">Merge Windows</div>
           <div class="feature-desc">
             Pulls all tabs from every other Chrome window into the current one.
-            Stop context-switching between windows — consolidate everything into
+            Stop context-switching between windows. Consolidate everything into
             one workspace with a single click.
           </div>
           <span class="feature-tag">Window Control</span>
@@ -1205,6 +1564,30 @@
             Hit <span class="kbd"><kbd>Alt</kbd><kbd>S</kbd></span> from anywhere
             to open StacTab and jump directly to the search. No more hunting through tab rows.
           </div>
+          <!-- live search visual -->
+          <div class="feature-visual">
+            <div class="fv-search-wrap">
+              <div class="fv-search-bar">
+                <span class="fv-search-icon">🔍</span>
+                <span class="fv-search-typed">youtu</span>
+                <div class="pm-cursor"></div>
+              </div>
+              <div class="fv-search-result">
+                <span class="fv-result-icon">▶️</span>
+                <div style="flex:1;">
+                  <div class="fv-result-title"><span class="fv-highlight">Youtu</span>be · Lo-fi hip hop radio</div>
+                  <div class="fv-result-url">youtube.com/watch?v=…</div>
+                </div>
+              </div>
+              <div class="fv-search-result">
+                <span class="fv-result-icon">▶️</span>
+                <div style="flex:1;">
+                  <div class="fv-result-title"><span class="fv-highlight">Youtu</span>be Studio · Analytics</div>
+                  <div class="fv-result-url">studio.youtube.com</div>
+                </div>
+              </div>
+            </div>
+          </div>
           <span class="feature-tag">Alt+S</span>
         </div>
 
@@ -1213,7 +1596,7 @@
           <div class="feature-title">Tab Count Badge</div>
           <div class="feature-desc">
             Always know exactly how many tabs you have open. StacTab displays a live count
-            badge directly on the extension icon in your toolbar — always visible, always accurate.
+            badge directly on the extension icon in your toolbar, always visible and always accurate.
           </div>
           <span class="feature-tag">Always Visible</span>
         </div>
@@ -1238,7 +1621,7 @@
     <div class="container">
       <p class="section-eyebrow fade-in">Workspace Vault</p>
       <h2 class="section-title fade-in fade-in-delay-1" style="color:#fff;">Your sessions.<br/>Safe, searchable, forever.</h2>
-      <p class="section-sub fade-in fade-in-delay-2">The Workspace Vault is StacTab's most powerful feature — a fully-featured tab archive that lives entirely in your browser.</p>
+      <p class="section-sub fade-in fade-in-delay-2">The Workspace Vault is StacTab's most powerful feature: a fully-featured tab archive that lives entirely in your browser.</p>
 
       <div class="vault-inner">
         <div>
@@ -1247,21 +1630,21 @@
               <span class="vault-feature-icon">📛</span>
               <div class="vault-feature-text">
                 <strong>Named Sessions</strong>
-                <span>Save groups of tabs as "Work", "Research", "Shopping" — whatever makes sense to you.</span>
+                <span>Save groups of tabs as "Work", "Research", "Shopping", whatever makes sense to you.</span>
               </div>
             </li>
             <li class="vault-feature-item fade-in fade-in-delay-2">
               <span class="vault-feature-icon">📦</span>
               <div class="vault-feature-text">
                 <strong>Flexible Archive Options</strong>
-                <span>Archive the current tab, all tabs, tabs to the left/right, or an entire tab group in one action.</span>
+                <span>Archive the current tab, all tabs, tabs to the left or right, or an entire tab group in one action.</span>
               </div>
             </li>
             <li class="vault-feature-item fade-in fade-in-delay-3">
               <span class="vault-feature-icon">🪟</span>
               <div class="vault-feature-text">
                 <strong>Split Groups to Windows</strong>
-                <span>Explode any tab group into its own new Chrome window — perfect for deep focus sessions.</span>
+                <span>Explode any tab group into its own new Chrome window, perfect for deep focus sessions.</span>
               </div>
             </li>
             <li class="vault-feature-item fade-in fade-in-delay-4">
@@ -1288,60 +1671,82 @@
           </ul>
         </div>
 
-        <!-- Vault UI mockup -->
+        <!-- Detailed Vault UI mockup -->
         <div class="fade-in fade-in-delay-2">
-          <div class="vault-mockup">
-            <div class="vm-header">
-              <div class="vm-header-title">
-                🗄️ Workspace Vault
-                <span class="vm-header-badge">3 sessions</span>
-              </div>
+          <div class="vault-mockup-v2">
+            <div class="vm2-topbar">
+              <div class="vm2-dot vm2-dot-r"></div>
+              <div class="vm2-dot vm2-dot-y"></div>
+              <div class="vm2-dot vm2-dot-g"></div>
+              <span class="vm2-page-title">🗄️ Workspace Vault</span>
+              <span class="vm2-badge">2 sessions</span>
             </div>
-            <div class="vm-search-bar">
-              🔍 Search vault...
+            <div class="vm2-search">
+              🔍&nbsp; Search vault sessions and tabs...
             </div>
-            <div class="vm-sessions">
+            <div class="vm2-body">
+              <div class="vm2-date-label">Fri, Jun 20</div>
 
-              <div class="vm-session vm-s1">
-                <div class="vm-session-header">
-                  <div class="vm-session-dot"></div>
-                  <span class="vm-session-name">Work — Q3 Planning</span>
-                  <span class="vm-session-meta">12 tabs · 2h ago</span>
+              <!-- Session 1 -->
+              <div class="vm2-session-card">
+                <div class="vm2-session-title-row">
+                  <span class="vm2-session-icon">📁</span>
+                  <span class="vm2-session-name">Work Session</span>
+                  <span class="vm2-session-count">5 tabs</span>
                 </div>
-                <div class="vm-session-tabs">
-                  <div class="vm-tab-row">📄 Q3 Roadmap — Notion</div>
-                  <div class="vm-tab-row">📊 Analytics Dashboard — Amplitude</div>
-                  <div class="vm-tab-row">💬 #design-review — Slack</div>
-                  <div class="vm-tab-row" style="color:rgba(255,255,255,.18);">+ 9 more tabs...</div>
+                <div class="vm2-domain-group">
+                  <div class="vm2-domain-label">
+                    <div class="vm2-domain-dot" style="background:#10B981;"></div>
+                    github.com · 3 tabs
+                  </div>
+                  <div class="vm2-tab-item">
+                    StacTab / Pull requests
+                    <div class="vm2-tab-url">github.com/MananSharma26/StacTab/pulls</div>
+                  </div>
+                  <div class="vm2-tab-item">
+                    Explore · GitHub
+                    <div class="vm2-tab-url">github.com/explore</div>
+                  </div>
+                  <div class="vm2-tab-item">
+                    Actions · workflow runs
+                    <div class="vm2-tab-url">github.com/…/actions</div>
+                  </div>
+                </div>
+                <div class="vm2-domain-group">
+                  <div class="vm2-domain-label">
+                    <div class="vm2-domain-dot" style="background:#EF4444;"></div>
+                    mail.google.com · 2 tabs
+                  </div>
+                  <div class="vm2-tab-item">
+                    Inbox (14) · Gmail
+                    <div class="vm2-tab-url">mail.google.com/mail/u/0/#inbox</div>
+                  </div>
+                  <div class="vm2-tab-item">
+                    Drafts · Gmail
+                    <div class="vm2-tab-url">mail.google.com/mail/u/0/#drafts</div>
+                  </div>
+                </div>
+                <div class="vm2-session-actions">
+                  <div class="vm2-action-btn restore">↩ Restore all</div>
+                  <div class="vm2-action-btn">⊞ New window</div>
+                  <div class="vm2-action-btn">🗑 Delete</div>
                 </div>
               </div>
 
-              <div class="vm-session vm-s2">
-                <div class="vm-session-header">
-                  <div class="vm-session-dot"></div>
-                  <span class="vm-session-name">Research — AI Papers</span>
-                  <span class="vm-session-meta">8 tabs · Yesterday</span>
+              <!-- Session 2 -->
+              <div class="vm2-session-card">
+                <div class="vm2-session-title-row">
+                  <span class="vm2-session-icon">📁</span>
+                  <span class="vm2-session-name">Research · AI Papers</span>
+                  <span class="vm2-session-count">8 tabs</span>
                 </div>
-                <div class="vm-session-tabs">
-                  <div class="vm-tab-row">📑 Attention Is All You Need — arXiv</div>
-                  <div class="vm-tab-row">📑 GPT-4 Technical Report — OpenAI</div>
-                  <div class="vm-tab-row" style="color:rgba(255,255,255,.18);">+ 6 more tabs...</div>
-                </div>
-              </div>
-
-              <div class="vm-session vm-s3">
-                <div class="vm-session-header">
-                  <div class="vm-session-dot"></div>
-                  <span class="vm-session-name">Shopping — Home Office</span>
-                  <span class="vm-session-meta">5 tabs · Mon</span>
+                <div class="vm2-session-actions">
+                  <div class="vm2-action-btn restore">↩ Restore all</div>
+                  <div class="vm2-action-btn">⊞ New window</div>
+                  <div class="vm2-action-btn">🗑 Delete</div>
                 </div>
               </div>
 
-            </div>
-            <div class="vm-footer-actions">
-              <div class="vm-footer-btn">📤 Export JSON</div>
-              <div class="vm-footer-btn">📝 Export .txt</div>
-              <div class="vm-footer-btn primary">+ New Session</div>
             </div>
           </div>
         </div>
@@ -1354,53 +1759,73 @@
     <div class="container">
       <p class="section-eyebrow fade-in">Get Started</p>
       <h2 class="section-title fade-in fade-in-delay-1">Up and running<br/>in under 60 seconds.</h2>
-      <p class="section-sub fade-in fade-in-delay-2">No Chrome Web Store listing (yet). Install directly from source — it takes less than a minute.</p>
+      <p class="section-sub fade-in fade-in-delay-2">No Chrome Web Store listing yet. Install directly from source. It takes less than a minute.</p>
 
       <div class="install-grid">
         <div>
-          <div class="install-steps">
 
-            <div class="install-step fade-in fade-in-delay-1">
-              <div class="step-number">1</div>
-              <div class="step-content">
-                <strong>Download the extension</strong>
-                <p>Go to the GitHub repo and click <em>Code → Download ZIP</em> and unzip it — or clone it with the command below.</p>
+          <!-- Step 1: Get the files (two options side by side) -->
+          <div class="install-step fade-in fade-in-delay-1">
+            <div class="step-number">1</div>
+            <div class="step-content" style="flex:1;">
+              <strong>Get the files</strong>
+              <p style="margin-bottom:14px;">Choose the option that works best for you:</p>
+              <div class="install-options">
+
+                <!-- Option A: Download ZIP -->
+                <div class="install-option-card ioc-a">
+                  <div class="ioc-label">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Option A
+                  </div>
+                  <div class="ioc-title">Download ZIP</div>
+                  <div class="ioc-desc">No git required. Just download and unzip.</div>
+                  <a class="ioc-download-btn" href="https://github.com/MananSharma26/StacTab/archive/refs/heads/main.zip" download>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download ZIP
+                  </a>
+                </div>
+
+                <!-- Option B: Clone with Git -->
+                <div class="install-option-card ioc-b fade-in fade-in-delay-2">
+                  <div class="ioc-label">Option B</div>
+                  <div class="ioc-title">Clone with Git</div>
+                  <div class="ioc-desc">For developers who prefer the command line.</div>
+                  <div style="background:#0F0720; border-radius:7px; padding:8px 10px; font-family:'Menlo',monospace; font-size:.62rem; color:#A78BFA; word-break:break-all; line-height:1.6; border:1px solid rgba(139,92,246,.2);">
+                    <span style="color:#6B7280;">git clone </span><span style="color:#34D399;">https://github.com/MananSharma26/StacTab.git</span>
+                  </div>
+                </div>
+
               </div>
             </div>
-
-            <div class="install-step fade-in fade-in-delay-2">
-              <div class="step-number">2</div>
-              <div class="step-content">
-                <strong>Open Chrome Extensions</strong>
-                <p>In a new Chrome tab, navigate to <code style="background:var(--bg); padding:2px 6px; border-radius:5px; font-size:.82rem; font-family:monospace; color:var(--purple);">chrome://extensions/</code></p>
-              </div>
-            </div>
-
-            <div class="install-step fade-in fade-in-delay-3">
-              <div class="step-number">3</div>
-              <div class="step-content">
-                <strong>Enable Developer Mode</strong>
-                <p>Toggle the <em>Developer mode</em> switch in the top-right corner of the Extensions page to ON.</p>
-              </div>
-            </div>
-
-            <div class="install-step fade-in fade-in-delay-4">
-              <div class="step-number">4</div>
-              <div class="step-content">
-                <strong>Load Unpacked</strong>
-                <p>Click the <em>Load unpacked</em> button and select the unzipped <strong>StacTab</strong> folder.</p>
-              </div>
-            </div>
-
-            <div class="install-step fade-in fade-in-delay-5">
-              <div class="step-number">5</div>
-              <div class="step-content">
-                <strong>You're done!</strong>
-                <p>StacTab appears in your toolbar. Pin it for quick access and press <span class="kbd"><kbd>Alt</kbd><kbd>S</kbd></span> anywhere to open it instantly.</p>
-              </div>
-            </div>
-
           </div>
+
+          <!-- Step 2: Open chrome://extensions -->
+          <div class="install-step fade-in fade-in-delay-2">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <strong>Enable Developer Mode</strong>
+              <p>Open <code style="background:var(--bg); padding:2px 6px; border-radius:5px; font-size:.82rem; font-family:monospace; color:var(--purple);">chrome://extensions/</code> in a new tab, then toggle <em>Developer mode</em> on in the top-right corner. Click <em>Load unpacked</em>.</p>
+            </div>
+          </div>
+
+          <!-- Step 3: Load unpacked -->
+          <div class="install-step fade-in fade-in-delay-3">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <strong>Select the StacTab folder</strong>
+              <p>Point Chrome at the unzipped <strong>StacTab</strong> folder (or the cloned repo). StacTab will appear in your toolbar immediately.</p>
+            </div>
+          </div>
+
+          <!-- Success message -->
+          <div class="install-success fade-in fade-in-delay-4">
+            <span class="install-success-icon">✅</span>
+            <div class="install-success-text">
+              <strong>That's it!</strong> Press <span class="kbd"><kbd>Alt</kbd><kbd>S</kbd></span> to open StacTab instantly from any tab. No restart needed.
+            </div>
+          </div>
+
         </div>
 
         <div>
@@ -1412,22 +1837,24 @@
               <span class="code-lang">bash</span>
             </div>
             <div class="code-body">
-<span class="code-comment"># Clone the repository</span>
+<span class="code-comment"># Option A: download the zip</span>
+<span class="code-comment"># (click the button above, then unzip)</span>
+
+<span class="code-comment"># Option B: clone with git</span>
 <span class="code-cmd">git</span> clone <span class="code-url">https://github.com/MananSharma26/StacTab.git</span>
 
-<span class="code-comment"># Or download the ZIP from GitHub</span>
-<span class="code-comment"># Code → Download ZIP → Unzip</span>
-
 <span class="code-comment"># Then in Chrome:</span>
-<span class="code-comment">#  chrome://extensions/ → Developer mode ON</span>
-<span class="code-comment">#  → Load unpacked → select /StacTab</span>
+<span class="code-comment">#  1. chrome://extensions/</span>
+<span class="code-comment">#  2. Developer mode → ON</span>
+<span class="code-comment">#  3. Load unpacked → select /StacTab</span>
+<span class="code-comment">#  4. Press Alt+S and you're live!</span>
             </div>
           </div>
 
           <div class="install-tip fade-in fade-in-delay-3">
             <span class="install-tip-icon">💡</span>
             <div class="install-tip-text">
-              <strong>Pro tip:</strong> After installing, press <span class="kbd"><kbd>Alt</kbd><kbd>S</kbd></span> from any tab to instantly open StacTab and search across all your open tabs — no need to click the toolbar icon.
+              <strong>Pro tip:</strong> After installing, press <span class="kbd"><kbd>Alt</kbd><kbd>S</kbd></span> from any tab to instantly open StacTab and search across all your open tabs. No need to click the toolbar icon.
             </div>
           </div>
 
@@ -1447,66 +1874,6 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════ HIGHLIGHTS -->
-  <section class="highlights-bg">
-    <div class="container">
-      <p class="section-eyebrow fade-in">Why StacTab</p>
-      <h2 class="section-title fade-in fade-in-delay-1">Built by a developer,<br/>for real workflows.</h2>
-
-      <div class="highlights-grid">
-
-        <div class="highlight-card fade-in fade-in-delay-1">
-          <div class="highlight-quote">🚀</div>
-          <p class="highlight-text">
-            "Auto-Pilot mode has changed how I browse. I open tabs freely and StacTab
-            silently keeps everything grouped. It's like having a personal assistant
-            tidy up my browser in real time."
-          </p>
-          <div class="highlight-author">
-            <div class="highlight-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);">👨‍💻</div>
-            <div>
-              <div class="highlight-name">Developer</div>
-              <div class="highlight-handle">Working across 5+ domains daily</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="highlight-card fade-in fade-in-delay-2">
-          <div class="highlight-quote">📚</div>
-          <p class="highlight-text">
-            "The Workspace Vault is incredible. I archive my research tabs at the end
-            of each session, name them by paper topic, and can restore exactly where
-            I left off the next morning. Game changer."
-          </p>
-          <div class="highlight-author">
-            <div class="highlight-avatar" style="background:linear-gradient(135deg,#34D399,#059669);">🔬</div>
-            <div>
-              <div class="highlight-name">Researcher</div>
-              <div class="highlight-handle">Managing 100+ sources per project</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="highlight-card fade-in fade-in-delay-3">
-          <div class="highlight-quote">💾</div>
-          <p class="highlight-text">
-            "Sleep Tabs alone made this worth it. My old laptop would crawl with 30+
-            tabs. Now I just sleep the background ones and everything flies again.
-            Free memory optimizer built right in."
-          </p>
-          <div class="highlight-author">
-            <div class="highlight-avatar" style="background:linear-gradient(135deg,#60A5FA,#3B82F6);">💻</div>
-            <div>
-              <div class="highlight-name">Power User</div>
-              <div class="highlight-handle">Always 30+ tabs open</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
   <!-- ═══════════════════════════════════════════ FOOTER -->
   <footer>
     <div class="footer-inner">
@@ -1517,7 +1884,7 @@
         </div>
         <p class="footer-brand-desc">
           A free, open-source Chrome extension that brings order to tab chaos.
-          Auto-groups, sleeps, dedupes, and archives your browser sessions —
+          Auto-groups, sleeps, dedupes, and archives your browser sessions,
           all locally, all privately.
         </p>
         <p class="footer-license">MIT License &nbsp;·&nbsp; v1.4.2</p>
