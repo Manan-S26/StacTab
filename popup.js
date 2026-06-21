@@ -39,7 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function loadGroupButtons() {
+    if (!chrome.tabGroups) return;
     chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT }, (groups) => {
+      if (chrome.runtime.lastError) return;
       const section = document.getElementById('groups-section');
       const list = document.getElementById('groups-list');
       if (!groups || groups.length === 0) { section.style.display = 'none'; return; }
@@ -254,18 +256,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  chrome.tabs.query({ currentWindow: true, active: true }, (activeTabs) => {
-    const activeTab = activeTabs[0];
-    if (activeTab) {
-      document.getElementById('arc-current').addEventListener('click', () => archiveTabs([activeTab]));
-      document.getElementById('arc-all').addEventListener('click', () => {
-        showSessionModal((sessionName) => {
-          chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => !t.url.includes('archive.html')), sessionName));
-        });
-      });
-      document.getElementById('arc-left').addEventListener('click', () => { chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => t.index < activeTab.index && !t.pinned && !t.url.includes('archive.html')))); });
-      document.getElementById('arc-right').addEventListener('click', () => { chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => t.index > activeTab.index && !t.url.includes('archive.html')))); });
-    }
+  document.getElementById('arc-current').addEventListener('click', () => {
+    chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+      if (tabs[0]) archiveTabs([tabs[0]]);
+    });
+  });
+  document.getElementById('arc-all').addEventListener('click', () => {
+    showSessionModal((sessionName) => {
+      chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => !t.url.includes('archive.html')), sessionName));
+    });
+  });
+  document.getElementById('arc-left').addEventListener('click', () => {
+    chrome.tabs.query({ currentWindow: true, active: true }, (activeTabs) => {
+      const activeTab = activeTabs[0];
+      if (!activeTab) return;
+      chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => t.index < activeTab.index && !t.pinned && !t.url.includes('archive.html'))));
+    });
+  });
+  document.getElementById('arc-right').addEventListener('click', () => {
+    chrome.tabs.query({ currentWindow: true, active: true }, (activeTabs) => {
+      const activeTab = activeTabs[0];
+      if (!activeTab) return;
+      chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => t.index > activeTab.index && !t.url.includes('archive.html'))));
+    });
   });
 
   const btnDashboard = document.getElementById('btn-dashboard');
