@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StacTab: Tame Your Tabs</title>
+  <link rel="icon" href="icon_v2.png" type="image/png">
   <meta name="description" content="StacTab is a Chrome extension that auto-groups tabs, sleeps inactive ones, dedupes, and gives you a searchable Workspace Vault, all with one click." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -340,12 +341,11 @@
     }
     .pmi-logo-icon {
       width: 24px; height: 24px;
-      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
       border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .72rem;
+      overflow: hidden;
       flex-shrink: 0;
     }
+    .pmi-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .pmi-brand-name {
       font-size: .92rem;
       font-weight: 700;
@@ -559,8 +559,28 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 48px;
-      align-items: center;
+      align-items: stretch;
       margin-top: 60px;
+    }
+    .what-right-col {
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes search-type {
+      0%, 10%   { width: 0ch }
+      18%       { width: 1ch }
+      26%       { width: 2ch }
+      34%       { width: 3ch }
+      42%       { width: 4ch }
+      50%       { width: 5ch }
+      58%       { width: 6ch }
+      66%, 83%  { width: 7ch }
+      93%, 100% { width: 0ch }
+    }
+    @keyframes fade-in-results {
+      0%, 68%   { opacity: 0; transform: translateY(5px); }
+      76%, 82%  { opacity: 1; transform: translateY(0); }
+      92%, 100% { opacity: 0; transform: translateY(0); }
     }
 
     /* before/after tab visual */
@@ -1313,7 +1333,7 @@
           <!-- top card: brand + toggle + group-at -->
           <div class="pmi-top-card">
             <div class="pmi-brand-row">
-              <div class="pmi-logo-icon">🗂️</div>
+              <div class="pmi-logo-icon"><img src="icon_v2.png" alt="StacTab"></div>
               <span class="pmi-brand-name">StacTab</span>
               <span class="pmi-autopilot-label">Auto-Pilot</span>
               <div class="pmi-toggle"></div>
@@ -1420,7 +1440,7 @@
         </div>
 
         <!-- Before → After vertical visual + search -->
-        <div class="fade-in fade-in-delay-2">
+        <div class="fade-in fade-in-delay-2 what-right-col">
 
           <!-- BEFORE: chaotic packed tabs -->
           <div style="background:#FFF7F7;border:1px solid #FECACA;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
@@ -1455,8 +1475,8 @@
           </div>
 
           <!-- Swoosh arrow -->
-          <div style="display:flex;align-items:center;justify-content:center;padding:10px 0;">
-            <svg width="260" height="62" viewBox="0 0 260 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div style="display:flex;align-items:center;justify-content:center;padding:6px 0;">
+            <svg width="260" height="76" viewBox="0 0 260 76" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="swoosh-grad" x1="0%" y1="50%" x2="100%" y2="50%">
                   <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.1"/>
@@ -1465,9 +1485,9 @@
                 </linearGradient>
               </defs>
               <!-- Tapered brush-stroke body -->
-              <path d="M 16 13 C 38 3, 108 1, 178 30 L 177 41 C 109 20, 42 18, 20 19 Z" fill="url(#swoosh-grad)"/>
-              <!-- Bold solid arrowhead -->
-              <polygon points="174,41 200,44 179,28" fill="#7C3AED"/>
+              <path d="M 16 22 C 38 12, 108 10, 178 38 L 177 50 C 109 30, 42 28, 20 28 Z" fill="url(#swoosh-grad)"/>
+              <!-- Bold wide solid arrowhead (2.5x) -->
+              <polygon points="166,58 203,44 182,18" fill="#7C3AED"/>
             </svg>
           </div>
 
@@ -1485,26 +1505,31 @@
             <div style="padding:6px 12px 10px;font-size:.65rem;color:#059669;font-weight:600;">Grouped by domain. Color-coded automatically.</div>
           </div>
 
+          <!-- Spacer: pushes search visual to align with bottom of left column -->
+          <div style="flex:1;min-height:40px;"></div>
+
           <!-- Search visual below — separate benefit, visually distinct -->
-          <div style="margin-top:48px;background:#F5F3FF;border:2px solid #DDD6FE;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
+          <div style="background:#F5F3FF;border:2px solid #DDD6FE;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
             <div style="padding:10px 12px 6px;">
-              <div style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:8px;font-size:.75rem;margin-bottom:8px;">
+              <!-- Animated search input -->
+              <div style="background:#EDE9FE;border:1px solid #DDD6FE;border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:8px;font-size:.75rem;margin-bottom:8px;">
                 <span style="color:#A78BFA;">🔍</span>
-                <span style="color:#1F1A33;font-weight:500;">youtu</span>
-                <span style="display:inline-block;width:1.5px;height:13px;background:#8B5CF6;animation:blink 1s infinite;"></span>
+                <span style="color:#1F1A33;font-weight:600;font-family:monospace;overflow:hidden;white-space:nowrap;display:inline-block;animation:search-type 6s linear infinite;">youtube</span>
+                <span style="display:inline-block;width:1.5px;height:13px;background:#8B5CF6;animation:blink 1s infinite;flex-shrink:0;"></span>
               </div>
-              <div style="background:#FAFAFE;border:1px solid #E5E0FF;border-radius:8px;overflow:hidden;">
+              <!-- Results fade in after typing -->
+              <div style="background:#FAFAFE;border:1px solid #E5E0FF;border-radius:8px;overflow:hidden;animation:fade-in-results 6s ease infinite;">
                 <div style="padding:7px 12px;border-bottom:1px solid #F5F3FF;display:flex;align-items:center;gap:8px;">
                   <span style="font-size:.8rem;">▶️</span>
                   <div>
-                    <div style="font-size:.7rem;font-weight:600;color:#1F1A33;"><span style="color:#8B5CF6;">Youtu</span>be · Lo-fi hip hop radio</div>
+                    <div style="font-size:.7rem;font-weight:600;color:#1F1A33;"><span style="color:#8B5CF6;">YouTube</span> · Lo-fi hip hop radio</div>
                     <div style="font-size:.6rem;color:#9CA3AF;">youtube.com/watch?v=…</div>
                   </div>
                 </div>
                 <div style="padding:7px 12px;display:flex;align-items:center;gap:8px;">
                   <span style="font-size:.8rem;">▶️</span>
                   <div>
-                    <div style="font-size:.7rem;font-weight:600;color:#1F1A33;"><span style="color:#8B5CF6;">Youtu</span>be Studio</div>
+                    <div style="font-size:.7rem;font-weight:600;color:#1F1A33;"><span style="color:#8B5CF6;">YouTube</span> Studio</div>
                     <div style="font-size:.6rem;color:#9CA3AF;">studio.youtube.com</div>
                   </div>
                 </div>
@@ -1524,6 +1549,7 @@
     <div class="container">
       <p class="section-eyebrow fade-in">Features</p>
       <h2 class="section-title fade-in fade-in-delay-1">Everything you need, <span style="color:#8B5CF6;">without the clutter.</span></h2>
+      <p class="section-sub fade-in fade-in-delay-2">One extension, several benefits.</p>
 
       <div class="features-grid">
 
@@ -1634,7 +1660,7 @@
   <section id="vault" class="vault-bg">
     <div class="container">
       <p class="section-eyebrow fade-in">Workspace Vault</p>
-      <h2 class="section-title fade-in fade-in-delay-1" style="color:#fff;">Your sessions.<br/>Safe, searchable, forever.</h2>
+      <h2 class="section-title fade-in fade-in-delay-1" style="color:#fff;">Your sessions. <span style="color:#C4B5FD;">Safe, searchable, forever.</span></h2>
       <p class="section-sub fade-in fade-in-delay-2">The Workspace Vault is StacTab's most powerful feature: a fully-featured tab archive that lives entirely in your browser.</p>
 
       <div class="vault-inner">
@@ -1772,7 +1798,7 @@
   <section id="install">
     <div class="container">
       <p class="section-eyebrow fade-in">Get Started</p>
-      <h2 class="section-title fade-in fade-in-delay-1">Up and running<br/>in under 60 seconds.</h2>
+      <h2 class="section-title fade-in fade-in-delay-1">Up and running in <span style="color:#8B5CF6;">under 60 seconds.</span></h2>
       <p class="section-sub fade-in fade-in-delay-2">No Chrome Web Store listing yet. Install directly from source. It takes less than a minute.</p>
 
       <div class="install-grid">
