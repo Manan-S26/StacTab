@@ -41,9 +41,20 @@ function updateBadge() {
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
     chrome.storage.local.get({ autoGroupEnabled: true, groupThreshold: 2 }, (res) => {
-      if (res.autoGroupEnabled) {
-        autoGroupTabs(res.groupThreshold);
-      }
+      const runGrouping = () => { if (res.autoGroupEnabled) autoGroupTabs(res.groupThreshold); };
+      // If tab is in a group, check if its new domain still matches that group
+      if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+        chrome.tabGroups.get(tab.groupId, (group) => {
+          if (chrome.runtime.lastError || !group) { runGrouping(); return; }
+          try {
+            const url = new URL(tab.url);
+            const smartName = url.protocol.startsWith('http') ? getSmartName(url) : null;
+            if (smartName && group.title !== smartName) {
+              chrome.tabs.ungroup([tabId], runGrouping);
+            } else { runGrouping(); }
+          } catch(e) { runGrouping(); }
+        });
+      } else { runGrouping(); }
     });
     updateBadge();
   }
