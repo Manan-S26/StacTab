@@ -288,8 +288,8 @@
     ══════════════════════════════════════ */
     .hero-mockup-wrap {
       position: relative; z-index: 1;
-      animation: float 5s ease-in-out infinite;
-      filter: drop-shadow(0 28px 64px rgba(109,40,217,.35));
+      display: flex; flex-direction: column;
+      width: min(420px, 92vw);
     }
 
     /* outer chrome frame */
@@ -1373,132 +1373,9 @@
 
     <!-- ACCURATE STACTAB POPUP MOCKUP -->
     <div class="hero-mockup-wrap fade-in fade-in-delay-4">
-      <div class="popup-chrome">
-        <!-- browser chrome bar -->
-        <div class="popup-chrome-bar">
-          <div class="pc-dot pc-dot-r"></div>
-          <div class="pc-dot pc-dot-y"></div>
-          <div class="pc-dot pc-dot-g"></div>
-          <div class="pc-url-bar">chrome-extension://stactab/popup.html</div>
-        </div>
 
-        <!-- popup content -->
-        <div class="popup-inner">
-
-          <!-- top card: brand + toggle + group-at -->
-          <div class="pmi-top-card">
-            <div class="pmi-brand-row">
-              <div class="pmi-logo-icon"><img src="icon_v2.png" alt="StacTab"></div>
-              <span class="pmi-brand-name">StacTab</span>
-              <span class="pmi-autopilot-label">Auto-Pilot</span>
-              <div class="pmi-toggle"></div>
-            </div>
-            <div class="pmi-groupat-row">
-              <span class="pmi-groupat-label">Group at</span>
-              <div class="pmi-num-btns">
-                <div class="pmi-num-btn active">2</div>
-                <div class="pmi-num-btn">3</div>
-                <div class="pmi-num-btn">4</div>
-                <div class="pmi-num-btn">5</div>
-              </div>
-              <span class="pmi-tabs-label">+ tabs</span>
-            </div>
-          </div>
-
-          <!-- search bar -->
-          <div class="pmi-search">
-            <span class="pmi-search-icon">🔍</span>
-            <span class="pmi-search-text">Search tabs... (Alt+S / Option+S)</span>
-            <div class="pmi-cursor"></div>
-          </div>
-
-          <!-- organize button -->
-          <div class="pmi-organize-btn">✦ Organize tabs into groups <span style="opacity:.5;font-size:.7em;">Alt+G</span></div>
-
-          <!-- tool bar -->
-          <div class="pmi-toolbar">
-            <div class="pmi-tool-btn">☾ Sleep tabs</div>
-            <div class="pmi-tool-btn">⦻ Dedupe tabs</div>
-            <div class="pmi-tool-btn">⊞ Merge windows</div>
-          </div>
-
-          <!-- archive section -->
-          <div class="pmi-section-hdr">
-            <span class="pmi-section-label">Archive Tabs</span>
-            <span class="pmi-vault-link">View Vault ↗</span>
-          </div>
-          <div class="pmi-archive-grid">
-            <div class="pmi-archive-btn">⊙ Current tab</div>
-            <div class="pmi-archive-btn">⟷ All tabs</div>
-            <div class="pmi-archive-btn">⟵ Left tabs</div>
-            <div class="pmi-archive-btn">⟶ Right tabs</div>
-          </div>
-
-          <!-- tab groups -->
-          <div class="pmi-section-hdr">
-            <span class="pmi-section-label">Tab Groups</span>
-          </div>
-          <div class="pmi-groups-section">
-            <div class="pmi-group-row">
-              <div class="pmi-group-dot" style="background:#10B981;"></div>
-              <span class="pmi-group-name">GitHub</span>
-              <span class="pmi-group-count">4 tabs</span>
-              <div class="pmi-split-btn">Split</div>
-            </div>
-            <div class="pmi-group-row">
-              <div class="pmi-group-dot" style="background:#EF4444;"></div>
-              <span class="pmi-group-name">Gmail</span>
-              <span class="pmi-group-count">2 tabs</span>
-              <div class="pmi-split-btn">Split</div>
-            </div>
-            <div class="pmi-group-row">
-              <div class="pmi-group-dot" style="background:#3B82F6;"></div>
-              <span class="pmi-group-name">Docs</span>
-              <span class="pmi-group-count">3 tabs</span>
-              <div class="pmi-split-btn">Split</div>
-            </div>
-          </div>
-
-        </div><!-- /popup-inner -->
-      </div><!-- /popup-chrome -->
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════ WHAT IS STACTAB -->
-  <section id="about">
-    <div class="container">
-      <div class="what-grid">
-        <div>
-          <p class="section-eyebrow fade-in">What is StacTab</p>
-          <h2 class="section-title fade-in fade-in-delay-1">Tab chaos is a solved problem.</h2>
-          <p class="section-sub fade-in fade-in-delay-2" style="margin-bottom:20px;">
-            StacTab is a lightweight Chrome extension that brings order to your browser automatically.
-          </p>
-          <ul class="fade-in fade-in-delay-3" style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:20px;">
-            <li style="display:flex;align-items:flex-start;gap:12px;">
-              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">⚡</span>
-              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Auto-grouping:</strong> Watches your tabs in real time and groups tabs by domain name automatically the moment your threshold is crossed. No configuration needed.</span>
-            </li>
-            <li style="display:flex;align-items:flex-start;gap:12px;">
-              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🔍</span>
-              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Instant search:</strong> Hit <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+S</kbd> to search every open tab by title or URL in real time. <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+G</kbd> to instantly group all tabs by domain.</span>
-            </li>
-            <li style="display:flex;align-items:flex-start;gap:12px;">
-              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🗄️</span>
-              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Workspace Vault:</strong> Archive entire sessions and restore them anytime. Never lose a tab again.</span>
-            </li>
-          </ul>
-          <p class="section-sub fade-in fade-in-delay-3" style="margin-bottom:32px;">
-            Built for anyone who's ever had 20+ tabs open and lost track of what they were doing.
-          </p>
-          <a href="#features" class="fade-in fade-in-delay-3" style="display:inline-flex;align-items:center;gap:6px;font-size:.9rem;font-weight:600;color:#8B5CF6;text-decoration:none;">See all features <span style="font-size:1.1rem;">→</span></a>
-        </div>
-
-        <!-- Before → After vertical visual + search -->
-        <div class="fade-in fade-in-delay-2 what-right-col">
-
-          <!-- BEFORE: chaotic packed tabs — shifted down slightly -->
-          <div style="margin-top:28px;background:#FFF7F7;border:1px solid #FECACA;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
+          <!-- BEFORE: chaotic packed tabs -->
+          <div style="background:#FFF7F7;border:1px solid #FECACA;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
             <div style="background:#E8EAED;padding:5px 6px 0;display:flex;gap:1px;align-items:flex-end;flex-wrap:wrap;overflow:hidden;max-height:52px;">
               <div class="fv-tab fv-tab-grey" style="padding:3px 5px;max-width:28px;">gh</div>
               <div class="fv-tab fv-tab-grey" style="padding:3px 5px;max-width:28px;opacity:.9;">G</div>
@@ -1539,7 +1416,6 @@
                   <stop offset="100%" stop-color="#7C3AED" stop-opacity="1"/>
                 </linearGradient>
               </defs>
-              <!-- Single unified path: body flows directly into arrowhead, no gap -->
               <path d="M 16 14 C 60 6, 120 16, 184 43 L 193 69 L 165 73 C 110 38, 58 22, 20 20 Z" fill="url(#swoosh-grad)"/>
             </svg>
           </div>
@@ -1558,19 +1434,17 @@
             <div style="padding:6px 12px 10px;font-size:.65rem;color:#059669;font-weight:600;">Grouped by domain. Color-coded automatically.</div>
           </div>
 
-          <!-- Spacer: pushes search visual to align with bottom of left column -->
+          <!-- Spacer -->
           <div style="flex:1;min-height:40px;"></div>
 
-          <!-- Search visual below — separate benefit, visually distinct -->
+          <!-- Search visual -->
           <div style="background:#F5F3FF;border:2px solid #DDD6FE;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
             <div style="padding:10px 12px 6px;">
-              <!-- Animated search input -->
               <div style="background:#EDE9FE;border:1px solid #DDD6FE;border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:8px;font-size:.75rem;margin-bottom:8px;">
                 <span style="color:#A78BFA;">🔍</span>
                 <span style="color:#1F1A33;font-weight:600;font-family:monospace;overflow:hidden;white-space:nowrap;display:inline-block;animation:search-type 5s linear infinite;">youtube</span>
                 <span style="display:inline-block;width:1.5px;height:13px;background:#8B5CF6;animation:blink 1s infinite;flex-shrink:0;"></span>
               </div>
-              <!-- Results fade in after typing -->
               <div style="background:#FAFAFE;border:1px solid #E5E0FF;border-radius:8px;overflow:hidden;animation:fade-in-results 5s ease infinite;">
                 <div style="padding:7px 12px;border-bottom:1px solid #F5F3FF;display:flex;align-items:center;gap:8px;">
                   <span style="font-size:.8rem;">▶️</span>
@@ -1591,6 +1465,129 @@
             <div style="padding:0 12px 10px;font-size:.65rem;color:#7C3AED;font-weight:600;">Find any open tab instantly. Alt+S on Windows · Option+S on Mac.</div>
           </div>
 
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ WHAT IS STACTAB -->
+  <section id="about">
+    <div class="container">
+      <div class="what-grid">
+        <div>
+          <p class="section-eyebrow fade-in">What is StacTab</p>
+          <h2 class="section-title fade-in fade-in-delay-1">Tab chaos is a solved problem.</h2>
+          <p class="section-sub fade-in fade-in-delay-2" style="margin-bottom:20px;">
+            StacTab is a lightweight Chrome extension that brings order to your browser automatically.
+          </p>
+          <ul class="fade-in fade-in-delay-3" style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:20px;">
+            <li style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">⚡</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Auto-grouping:</strong> Watches your tabs in real time and groups tabs by domain name automatically the moment your threshold is crossed. No configuration needed.</span>
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🔍</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Instant search:</strong> Hit <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+S</kbd> to search every open tab by title or URL in real time. <kbd style="background:#F5F3FF;border:1px solid #E5E0FF;border-radius:4px;padding:1px 5px;font-size:.78rem;font-family:monospace;">Alt+G</kbd> to instantly group all tabs by domain.</span>
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,.12);color:#8B5CF6;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">🗄️</span>
+              <span style="font-size:.92rem;color:var(--sub);line-height:1.55;"><strong style="color:var(--text);">Workspace Vault:</strong> Archive entire sessions and restore them anytime. Never lose a tab again.</span>
+            </li>
+          </ul>
+          <p class="section-sub fade-in fade-in-delay-3" style="margin-bottom:32px;">
+            Built for anyone who's ever had 20+ tabs open and lost track of what they were doing.
+          </p>
+          <a href="#features" class="fade-in fade-in-delay-3" style="display:inline-flex;align-items:center;gap:6px;font-size:.9rem;font-weight:600;color:#8B5CF6;text-decoration:none;">See all features <span style="font-size:1.1rem;">→</span></a>
+        </div>
+
+        <!-- Before → After vertical visual + search -->
+        <div class="fade-in fade-in-delay-2 what-right-col" style="align-items:center;justify-content:center;">
+          <div class="popup-chrome">
+            <!-- browser chrome bar -->
+            <div class="popup-chrome-bar">
+              <div class="pc-dot pc-dot-r"></div>
+              <div class="pc-dot pc-dot-y"></div>
+              <div class="pc-dot pc-dot-g"></div>
+              <div class="pc-url-bar">chrome-extension://stactab/popup.html</div>
+            </div>
+
+            <!-- popup content -->
+            <div class="popup-inner">
+
+              <!-- top card: brand + toggle + group-at -->
+              <div class="pmi-top-card">
+                <div class="pmi-brand-row">
+                  <div class="pmi-logo-icon"><img src="icon_v2.png" alt="StacTab"></div>
+                  <span class="pmi-brand-name">StacTab</span>
+                  <span class="pmi-autopilot-label">Auto-Pilot</span>
+                  <div class="pmi-toggle"></div>
+                </div>
+                <div class="pmi-groupat-row">
+                  <span class="pmi-groupat-label">Group at</span>
+                  <div class="pmi-num-btns">
+                    <div class="pmi-num-btn active">2</div>
+                    <div class="pmi-num-btn">3</div>
+                    <div class="pmi-num-btn">4</div>
+                    <div class="pmi-num-btn">5</div>
+                  </div>
+                  <span class="pmi-tabs-label">+ tabs</span>
+                </div>
+              </div>
+
+              <!-- search bar -->
+              <div class="pmi-search">
+                <span class="pmi-search-icon">🔍</span>
+                <span class="pmi-search-text">Search tabs... (Alt+S / Option+S)</span>
+                <div class="pmi-cursor"></div>
+              </div>
+
+              <!-- organize button -->
+              <div class="pmi-organize-btn">✦ Organize tabs into groups <span style="opacity:.5;font-size:.7em;">Alt+G</span></div>
+
+              <!-- tool bar -->
+              <div class="pmi-toolbar">
+                <div class="pmi-tool-btn">☾ Sleep tabs</div>
+                <div class="pmi-tool-btn">⦻ Dedupe tabs</div>
+                <div class="pmi-tool-btn">⊞ Merge windows</div>
+              </div>
+
+              <!-- archive section -->
+              <div class="pmi-section-hdr">
+                <span class="pmi-section-label">Archive Tabs</span>
+                <span class="pmi-vault-link">View Vault ↗</span>
+              </div>
+              <div class="pmi-archive-grid">
+                <div class="pmi-archive-btn">⊙ Current tab</div>
+                <div class="pmi-archive-btn">⟷ All tabs</div>
+                <div class="pmi-archive-btn">⟵ Left tabs</div>
+                <div class="pmi-archive-btn">⟶ Right tabs</div>
+              </div>
+
+              <!-- tab groups -->
+              <div class="pmi-section-hdr">
+                <span class="pmi-section-label">Tab Groups</span>
+              </div>
+              <div class="pmi-groups-section">
+                <div class="pmi-group-row">
+                  <div class="pmi-group-dot" style="background:#10B981;"></div>
+                  <span class="pmi-group-name">GitHub</span>
+                  <span class="pmi-group-count">4 tabs</span>
+                  <div class="pmi-split-btn">Split</div>
+                </div>
+                <div class="pmi-group-row">
+                  <div class="pmi-group-dot" style="background:#EF4444;"></div>
+                  <span class="pmi-group-name">Gmail</span>
+                  <span class="pmi-group-count">2 tabs</span>
+                  <div class="pmi-split-btn">Split</div>
+                </div>
+                <div class="pmi-group-row">
+                  <div class="pmi-group-dot" style="background:#3B82F6;"></div>
+                  <span class="pmi-group-name">Docs</span>
+                  <span class="pmi-group-count">3 tabs</span>
+                  <div class="pmi-split-btn">Split</div>
+                </div>
+              </div>
+
+            </div><!-- /popup-inner -->
+          </div><!-- /popup-chrome -->
         </div>
       </div>
 
