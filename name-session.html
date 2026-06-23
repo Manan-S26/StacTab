@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Name Session</title>
+  <style>
+    :root {
+      --bg: #F5F3FF;
+      --surface: #FFFFFF;
+      --border: #E5E0FF;
+      --text-main: #1F1A33;
+      --text-sub: #6B628D;
+      --accent: #8B5CF6;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .title img { width: 18px; height: 18px; }
+    .hint {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+    }
+    .input {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 12px;
+    }
+    .input:focus { border-color: var(--accent); }
+    .actions { display: flex; gap: 8px; }
+    .btn-confirm {
+      flex: 1;
+      padding: 9px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-confirm:hover { opacity: 0.9; }
+    .btn-cancel {
+      padding: 9px 16px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-cancel:hover { background: var(--surface); }
+  </style>
+</head>
+<body>
+  <div class="title">
+    <img src="icon_v2.png" alt="">
+    Name this session
+  </div>
+  <div class="hint">Optional — leave blank to use today's date</div>
+  <input id="name-input" class="input" type="text" placeholder="e.g. Work, Research, Planning...">
+  <div class="actions">
+    <button id="btn-confirm" class="btn-confirm">Archive</button>
+    <button id="btn-cancel" class="btn-cancel">Cancel</button>
+  </div>
+  <script src="name-session.js"></script>
+</body>
+</html>

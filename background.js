@@ -113,6 +113,27 @@ function openDashboard() {
     });
 }
 
+function openNameSessionWindow(tabs) {
+  if (!tabs || tabs.length === 0) return;
+  tabs = tabs.filter(t => { try { return new URL(t.url).protocol.startsWith('http'); } catch(e) { return false; } });
+  if (tabs.length === 0) {
+    chrome.action.setBadgeText({ text: '✗' });
+    chrome.action.setBadgeBackgroundColor({ color: '#EF4444' });
+    setTimeout(() => updateBadge(), 1500);
+    return;
+  }
+  const pending = tabs.map(t => ({ id: t.id, url: t.url, title: t.title || t.url }));
+  chrome.storage.local.set({ pendingContextArchive: pending }, () => {
+    chrome.windows.create({
+      url: chrome.runtime.getURL('name-session.html'),
+      type: 'popup',
+      width: 360,
+      height: 200,
+      focused: true
+    });
+  });
+}
+
 function archiveTabs(tabsToArchive) {
     if (!tabsToArchive || tabsToArchive.length === 0) return;
     tabsToArchive = tabsToArchive.filter(t => { try { return new URL(t.url).protocol.startsWith('http'); } catch(e) { return false; } });
@@ -181,7 +202,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       archiveTabs([tab]);
       break;
     case "arc-all-ctx":
-      chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => !t.url.includes('archive.html'))));
+      chrome.tabs.query({ currentWindow: true }, tabs => openNameSessionWindow(tabs.filter(t => !t.url.includes('archive.html'))));
       break;
     case "arc-left-ctx":
       chrome.tabs.query({ currentWindow: true }, tabs => archiveTabs(tabs.filter(t => t.index < tab.index && !t.pinned && !t.url.includes('archive.html'))));
