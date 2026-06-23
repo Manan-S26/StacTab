@@ -31,11 +31,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const isMac = navigator.platform.toUpperCase().includes('MAC') || navigator.userAgent.includes('Mac');
   if (isMac) {
     const searchInput = document.getElementById('live-search');
-    if (searchInput) searchInput.placeholder = 'Search tabs... (⌥S)';
+    if (searchInput) searchInput.placeholder = 'Search tabs... (Option+S)';
     const sortBtn = document.getElementById('btn-sort');
     if (sortBtn) {
       const shortcutSpan = sortBtn.querySelector('span[style*="opacity"]');
-      if (shortcutSpan) shortcutSpan.textContent = '⌥G';
+      if (shortcutSpan) shortcutSpan.textContent = 'Option+G';
     }
   }
 
