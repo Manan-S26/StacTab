@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StacTab — Auto-group your browser tabs</title>
+  <meta name="description" content="StacTab automatically groups, sleeps, deduplicates, and archives your tabs. The browser you always wanted.">
+  <meta property="og:title" content="StacTab — Auto-group your browser tabs">
+  <meta property="og:description" content="StacTab automatically groups, sleeps, deduplicates, and archives your tabs. The browser you always wanted.">
+  <meta property="og:type" content="website">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #09080F;
+      --surface: #110F1C;
+      --surface-2: #19162A;
+      --border: rgba(139,92,246,0.18);
+      --text: #F0ECFF;
+      --sub: rgba(240,236,255,0.45);
+      --purple: #8B5CF6;
+      --purple-light: #A78BFA;
+      --purple-dark: #6D28D9;
+      --purple-deep: #4C1D95;
+      --purple-glow: rgba(139,92,246,0.25);
+      --green: #10B981;
+      --red: #EF4444;
+      --blue: #3B82F6;
+      --yellow: #F59E0B;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ============================================================
+       KEYFRAMES (wrapped in prefers-reduced-motion)
+    ============================================================ */
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0; }
+      }
+      @keyframes bounce-dot {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(8px); }
+      }
+      @keyframes pulse-ring {
+        0%   { transform: scale(0.95); opacity: 0.8; }
+        70%  { transform: scale(1.05); opacity: 0.2; }
+        100% { transform: scale(0.95); opacity: 0; }
+      }
+      @keyframes sweep-radial {
+        from { opacity: 0; transform: scale(0); }
+        to   { opacity: 1; transform: scale(1); }
+      }
+      @keyframes tab-pill-in {
+        from { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.8); }
+        to   { opacity: 1; transform: translate(var(--sx), var(--sy)) scale(1); }
+      }
+      @keyframes glow-pulse {
+        0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.3); }
+        50%       { box-shadow: 0 0 40px rgba(139,92,246,0.6); }
+      }
+      @keyframes gradient-shift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      @keyframes memory-bar-shrink {
+        from { width: 87%; background: var(--red); }
+        to   { width: 34%; background: var(--green); }
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50%       { transform: translateY(-6px); }
+      }
+      @keyframes checkmark-draw {
+        from { stroke-dashoffset: 100; opacity: 0; }
+        to   { stroke-dashoffset: 0; opacity: 1; }
+      }
+    }
+
+    /* ============================================================
+       NAV
+    ============================================================ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(9,8,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-bottom 0.3s ease;
+    }
+    nav.scrolled {
+      border-bottom: 1px solid rgba(139,92,246,0.2);
+    }
+    .nav-logo {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.3px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .nav-link {
+      font-size: 0.88rem;
+      color: var(--sub);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--purple);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 8px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ============================================================
+       SECTION 0 — Opening Interrupt
+    ============================================================ */
+    #hero-interrupt {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .interrupt-stage {
+      position: relative;
+      width: 700px;
+      height: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .interrupt-label {
+      font-size: 0.75rem;
+      color: var(--sub);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 8px;
+      transition: opacity 0.5s;
+    }
+
+    .interrupt-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(5rem, 14vw, 8rem);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+      transition: opacity 0.5s, transform 0.5s;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Tab pills */
+    .tab-pill {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--sub);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      will-change: transform, opacity;
+      transition:
+        opacity 0.4s ease,
+        transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 5;
+    }
+    .tab-pill.visible { opacity: 1; }
+    .tab-favicon {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Radial sweep overlay */
+    .sweep-circle {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      transition: transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.8s;
+      opacity: 0;
+      z-index: 3;
+    }
+    .sweep-circle.expanded {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    /* Group labels */
+    .group-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 6;
+    }
+    .group-label.visible { opacity: 1; }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, transparent, rgba(139,92,246,0.5));
+    }
+    .scroll-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--purple);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .scroll-dot { animation: bounce-dot 1.5s ease-in-out infinite; }
+    }
+
+    /* ============================================================
+       SECTION 1 — Statement Hero
+    ============================================================ */
+    #statement-hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 55% 45%;
+      align-items: center;
+      background: var(--bg);
+      padding: 80px 60px 60px;
+      gap: 40px;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-headline {
+      font-size: clamp(3.2rem, 8vw, 7rem);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -3px;
+      margin-bottom: 24px;
+    }
+    .hero-headline .line-normal { color: var(--text); display: block; }
+    .hero-headline .line-purple { color: var(--purple); display: block; }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--sub);
+      line-height: 1.6;
+      max-width: 400px;
+      margin-bottom: 32px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .btn-primary {
+      background: var(--purple);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 10px;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 10px;
+      transition: border-color 0.2s, color 0.2s;
+      display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--purple); color: var(--purple-light); }
+
+    .trust-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .trust-chip {
+      font-size: 0.75rem;
+      color: var(--sub);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+
+    /* Terminal */
+    .terminal-panel {
+      background: #0A0818;
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      padding: 20px;
+      height: 320px;
+      overflow: hidden;
+      position: relative;
+    }
+    .terminal-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #FF5F57; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #28CA41; }
+
+    #terminal-output {
+      white-space: pre-wrap;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    #terminal-output::after {
+      content: '|';
+      color: var(--purple);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      #terminal-output::after { animation: blink 1s step-end infinite; }
+    }
+
+    /* ============================================================
+       SECTION 2 — Scroll-Driven Tab Demo
+    ============================================================ */
+    #features {
+      position: relative;
+      min-height: 300vh;
+      background: var(--bg);
+    }
+    .features-inner {
+      display: flex;
+      position: relative;
+    }
+
+    /* Sticky Left */
+    .features-left {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Browser mockup */
+    .browser-mockup {
+      width: 90%;
+      max-width: 500px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #0F0D1A;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    .browser-chrome {
+      background: #1A1726;
+      padding: 10px 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .browser-dots {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+    .bdot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .bdot-r { background: rgba(255,95,87,0.7); }
+    .bdot-y { background: rgba(255,189,46,0.7); }
+    .bdot-g { background: rgba(40,202,65,0.7); }
+
+    .browser-tabs {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      height: 32px;
+      overflow: hidden;
+      position: relative;
+    }
+    .b-tab {
+      height: 26px;
+      border-radius: 6px 6px 0 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      gap: 4px;
+      font-size: 0.6rem;
+      color: rgba(240,236,255,0.4);
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      white-space: nowrap;
+      overflow: hidden;
+      min-width: 24px;
+      flex-shrink: 0;
+    }
+    .b-tab.active {
+      background: #0F0D1A;
+      color: var(--text);
+    }
+    .b-tab-favicon {
+      width: 7px; height: 7px; border-radius: 1px; flex-shrink: 0;
+    }
+
+    /* Group bars in tab bar */
+    .b-group-bar {
+      height: 3px;
+      border-radius: 2px;
+      position: absolute;
+      bottom: 0;
+      transition: all 0.5s ease;
+      opacity: 0;
+    }
+    .b-group-bar.visible { opacity: 1; }
+
+    .browser-content {
+      padding: 20px;
+      height: 220px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Chapter visuals */
+    .chapter-visual {
+      position: absolute;
+      inset: 0;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+    .chapter-visual.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Chapter 1 — Grouped tabs visual */
+    .grouped-tabs-display {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .group-section {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .group-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .group-name-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .mini-tab {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.6rem;
+      color: var(--sub);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .mini-favicon {
+      width: 6px; height: 6px; border-radius: 1px;
+    }
+
+    /* Chapter 2 — Memory visual */
+    .memory-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .memory-label {
+      font-size: 0.7rem;
+      color: var(--sub);
+      margin-bottom: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .memory-bar-track {
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .memory-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 87%;
+      background: var(--red);
+      transition: width 1.5s cubic-bezier(0.4,0,0.2,1), background 1.5s ease;
+    }
+    .memory-bar-fill.reduced {
+      width: 34%;
+      background: var(--green);
+    }
+    .memory-pct {
+      font-size: 0.65rem;
+      color: var(--sub);
+      margin-top: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: color 0.5s;
+    }
+    .dup-tab-row {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.15);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+    }
+    .dup-badge {
+      font-size: 0.6rem;
+      color: var(--red);
+      background: rgba(239,68,68,0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .dup-tab-row.dismissed {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    /* Chapter 3 — Search visual */
+    .search-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .fake-search-bar {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text);
+    }
+    .search-icon { color: var(--sub); font-size: 0.9rem; }
+    .search-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 12px;
+      background: var(--purple);
+      margin-left: 1px;
+      vertical-align: middle;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .search-cursor { animation: blink 1s step-end infinite; }
+    }
+    .search-result {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .search-result.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .search-result.highlighted {
+      border-color: rgba(139,92,246,0.3);
+      background: rgba(139,92,246,0.05);
+    }
+    .sr-favicon {
+      width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
+    }
+    .sr-info { flex: 1; min-width: 0; }
+    .sr-title { font-size: 0.72rem; color: var(--text); }
+    .sr-url { font-size: 0.62rem; color: var(--sub); margin-top: 1px; }
+
+    /* Right scrollable chapters */
+    .features-right {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+    }
+    .chapter {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 60px 40px;
+    }
+    .chapter-content {
+      max-width: 440px;
+    }
+    .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 16px;
+    }
+    .chapter-headline {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .chapter-body {
+      font-size: 1rem;
+      color: var(--sub);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .shortcut-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--purple-light);
+    }
+
+    /* ============================================================
+       SECTION 3 — Vault
+    ============================================================ */
+    #vault {
+      background: #050408;
+      padding: 120px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    #vault::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+    }
+    .vault-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .vault-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--purple);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .vault-headline {
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 900;
+      color: var(--purple);
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+    .vault-sub {
+      font-size: 1rem;
+      color: var(--sub);
+      text-align: center;
+      line-height: 1.7;
+      max-width: 560px;
+      margin: 0 auto 48px;
+    }
+
+    .vault-card {
+      background: #0D0B1A;
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .vault-card::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border: 1.5px solid var(--purple);
+      border-radius: inherit;
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+    .vault-card.in-view::after {
+      clip-path: inset(0 0% 0 0);
+    }
+    .vault-card-header {
+      background: #0A0816;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(139,92,246,0.15);
+      font-size: 0.8rem;
+      color: var(--sub);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .vault-header-title { font-weight: 600; color: var(--text); font-size: 0.82rem; }
+    .vault-header-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .vault-action-btn {
+      font-size: 0.72rem;
+      color: var(--sub);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .vault-action-btn:hover { background: rgba(139,92,246,0.1); color: var(--purple-light); }
+
+    .vault-row {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(139,92,246,0.08);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .vault-row:last-child { border-bottom: none; }
+    .vault-row:hover { background: rgba(139,92,246,0.04); }
+    .vault-star {
+      color: var(--purple);
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .vault-session-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+    .vault-tab-count {
+      font-size: 0.75rem;
+      color: var(--sub);
+      white-space: nowrap;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .vault-domains {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .domain-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .vault-domain-names {
+      font-size: 0.7rem;
+      color: var(--sub);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .restore-btn {
+      background: rgba(139,92,246,0.15);
+      color: var(--purple-light);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+    .restore-btn:hover { background: rgba(139,92,246,0.25); }
+
+    .vault-privacy-note {
+      font-size: 0.82rem;
+      color: var(--sub);
+      text-align: center;
+      margin-top: 24px;
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       SECTION 4 — Shortcuts
+    ============================================================ */
+    #shortcuts {
+      background: var(--bg);
+      padding: 100px 40px;
+    }
+    .shortcuts-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--purple);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .shortcuts-headline {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      color: var(--text);
+      text-align: center;
+      letter-spacing: -1.5px;
+      margin-bottom: 64px;
+    }
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .shortcut-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .shortcut-panel:hover {
+      border-color: rgba(139,92,246,0.4);
+      transform: translateY(-4px);
+    }
+    .keys-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .big-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(1.1rem, 2.5vw, 1.7rem);
+      font-weight: 700;
+      padding: 12px 18px;
+      color: var(--text);
+      box-shadow: 0 5px 0 var(--purple-deep), 0 6px 12px rgba(0,0,0,0.4);
+      transition: transform 0.08s, box-shadow 0.08s;
+      cursor: default;
+      user-select: none;
+    }
+    .big-key:hover {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 var(--purple-deep), 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .key-plus {
+      font-size: 1.2rem;
+      color: var(--sub);
+      font-weight: 400;
+    }
+    .shortcut-verb {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--purple);
+      margin: 0 0 8px;
+    }
+    .shortcut-desc {
+      font-size: 0.92rem;
+      color: var(--sub);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .mac-note {
+      font-size: 0.78rem;
+      color: rgba(240,236,255,0.35);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ============================================================
+       SECTION 5 — Install CTA
+    ============================================================ */
+    #install {
+      background: linear-gradient(160deg, #09080F 0%, #1A0F35 50%, #09080F 100%);
+      padding: 120px 40px;
+      text-align: center;
+    }
+    .install-number {
+      font-size: clamp(4rem, 12vw, 9rem);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -4px;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+    .install-sub1 {
+      font-size: 1.1rem;
+      color: var(--sub);
+      margin-bottom: 8px;
+    }
+    .install-sub2 {
+      font-size: 0.9rem;
+      color: var(--sub);
+      opacity: 0.7;
+      margin-bottom: 40px;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+      background-size: 200% 100%;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 18px 40px;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 4px 24px rgba(139,92,246,0.4);
+      transition: background-position 0.6s, transform 0.2s, box-shadow 0.2s;
+      margin-bottom: 20px;
+    }
+    .cta-btn:hover {
+      background-position: 100% 0;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(139,92,246,0.5);
+    }
+    .install-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--sub);
+      margin-bottom: 16px;
+    }
+    .install-links a:hover { color: var(--purple-light); }
+    .install-links .sep { opacity: 0.4; }
+    .trust-line {
+      font-size: 0.75rem;
+      color: rgba(240,236,255,0.3);
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: #000;
+      border-top: 1px solid rgba(139,92,246,0.15);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--sub);
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-links .sep { opacity: 0.4; }
+    .footer-right {
+      font-size: 0.8rem;
+      color: rgba(240,236,255,0.3);
+    }
+
+    /* ============================================================
+       INTERSECTION OBSERVER — reveal classes
+    ============================================================ */
+    [data-observe] {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    [data-observe].in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Vault card should NOT have the generic fade-in since it has its own */
+    .vault-card[data-observe] {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ============================================================
+       MOBILE RESPONSIVE
+    ============================================================ */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links .nav-link { display: none; }
+
+      #hero-interrupt { padding: 80px 20px 40px; }
+      .interrupt-stage {
+        width: 360px;
+        height: 420px;
+        transform: scale(0.75);
+      }
+
+      #statement-hero {
+        grid-template-columns: 1fr;
+        padding: 80px 24px 60px;
+        min-height: auto;
+        gap: 32px;
+      }
+      .hero-headline { font-size: clamp(2.5rem, 10vw, 4rem); letter-spacing: -2px; }
+
+      .features-left {
+        position: static;
+        width: 100%;
+        height: 300px;
+        padding: 20px;
+      }
+      .features-inner { flex-direction: column; }
+      .features-right { width: 100%; }
+      .chapter { padding: 40px 24px; min-height: auto; }
+      #features { min-height: auto; }
+
+      .shortcuts-grid { grid-template-columns: 1fr; }
+
+      footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        padding: 24px 20px;
+      }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+
+      .vault-row {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .vault-domain-names { display: none; }
+    }
+
+    /* ============================================================
+       UTILITY
+    ============================================================ */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+    .text-center { text-align: center; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav id="nav">
+  <a href="#" class="nav-logo">🗂️ StacTab</a>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#vault" class="nav-link">Vault</a>
+    <a href="https://github.com/Manan-S26/StacTab" target="_blank" class="nav-link">GitHub</a>
+    <a href="https://chromewebstore.google.com/detail/stactab/hdfcdcoogjkdogmnhhopkekanpldoefh" target="_blank" class="nav-cta">Add to Chrome</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     SECTION 0 — Opening Interrupt
+============================================================ -->
+<section id="hero-interrupt">
+  <div class="interrupt-stage" id="interrupt-stage">
+    <!-- Radial sweep -->
+    <div class="sweep-circle" id="sweep-circle"></div>
+
+    <!-- Center count display -->
+    <div style="position:relative;z-index:10;text-align:center;pointer-events:none;">
+      <div class="interrupt-label" id="interrupt-label">tabs open</div>
+      <div class="interrupt-number" id="interrupt-number">1</div>
+    </div>
+
+    <!-- Tab pills -->
+    <div class="tab-pill" id="pill-github" style="--sx:-220px;--sy:-80px;--gx:-240px;--gy:40px">
+      <div class="tab-favicon" style="background:#10B981;"></div>github.com
+    </div>
+    <div class="tab-pill" id="pill-notion" style="--sx:180px;--sy:-120px;--gx:-240px;--gy:80px">
+      <div class="tab-favicon" style="background:#6B7280;"></div>notion.so
+    </div>
+    <div class="tab-pill" id="pill-gmail" style="--sx:-160px;--sy:100px;--gx:-80px;--gy:40px">
+      <div class="tab-favicon" style="background:#EF4444;"></div>gmail.com
+    </div>
+    <div class="tab-pill" id="pill-twitter" style="--sx:240px;--sy:60px;--gx:-80px;--gy:80px">
+      <div class="tab-favicon" style="background:#0EA5E9;"></div>twitter.com
+    </div>
+    <div class="tab-pill" id="pill-youtube" style="--sx:-80px;--sy:-160px;--gx:80px;--gy:40px">
+      <div class="tab-favicon" style="background:#EF4444;"></div>youtube.com
+    </div>
+    <div class="tab-pill" id="pill-linear" style="--sx:100px;--sy:140px;--gx:80px;--gy:80px">
+      <div class="tab-favicon" style="background:#8B5CF6;"></div>linear.app
+    </div>
+    <div class="tab-pill" id="pill-figma" style="--sx:-260px;--sy:40px;--gx:240px;--gy:40px">
+      <div class="tab-favicon" style="background:#EC4899;"></div>figma.com
+    </div>
+    <div class="tab-pill" id="pill-slack" style="--sx:160px;--sy:-80px;--gx:240px;--gy:80px">
+      <div class="tab-favicon" style="background:#F59E0B;"></div>slack.com
+    </div>
+    <div class="tab-pill" id="pill-docs" style="--sx:40px;--sy:180px;--gx:400px;--gy:40px">
+      <div class="tab-favicon" style="background:#3B82F6;"></div>docs.google.com
+    </div>
+    <div class="tab-pill" id="pill-stackoverflow" style="--sx:-40px;--sy:-200px;--gx:400px;--gy:80px">
+      <div class="tab-favicon" style="background:#F97316;"></div>stackoverflow.com
+    </div>
+
+    <!-- Group labels (shown in phase 2) -->
+    <div class="group-label" id="gl-work" style="--gx:0px;--gy:0px">
+      <!-- handled via JS positioning -->
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <div class="scroll-dot"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 1 — Statement Hero
+============================================================ -->
+<section id="statement-hero">
+  <div class="hero-left">
+    <h1 class="hero-headline">
+      <span class="line-normal">You don't</span>
+      <span class="line-normal">have a tab</span>
+      <span class="line-normal">problem.</span>
+      <span class="line-normal" style="display:block;height:0.5em;"></span>
+      <span class="line-purple">You have a</span>
+      <span class="line-purple">memory</span>
+      <span class="line-purple">problem.</span>
+    </h1>
+    <p class="hero-sub">StacTab automatically groups, sleeps, deduplicates, and archives your tabs. The browser you always wanted.</p>
+    <div class="hero-buttons">
+      <a href="https://chromewebstore.google.com/detail/stactab/hdfcdcoogjkdogmnhhopkekanpldoefh" target="_blank" class="btn-primary">Take control — it's free</a>
+      <a href="https://github.com/Manan-S26/StacTab" target="_blank" class="btn-secondary">View on GitHub →</a>
+    </div>
+    <div class="trust-chips">
+      <span class="trust-chip">⭐ Open source · MIT</span>
+      <span class="trust-chip">🔒 Zero data collected</span>
+      <span class="trust-chip">⚡ &lt; 50ms grouping</span>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="terminal-panel">
+      <div class="terminal-dots">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <pre id="terminal-output"></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 2 — Scroll-Driven Tab Demo
+============================================================ -->
+<section id="features">
+  <div class="features-inner">
+
+    <!-- Sticky Left Panel -->
+    <div class="features-left" id="features-panel">
+      <div class="browser-mockup" id="browser-mockup">
+
+        <!-- Browser chrome -->
+        <div class="browser-chrome">
+          <div class="browser-dots">
+            <div class="bdot bdot-r"></div>
+            <div class="bdot bdot-y"></div>
+            <div class="bdot bdot-g"></div>
+          </div>
+          <!-- Tab bar -->
+          <div class="browser-tabs" id="browser-tabs">
+            <div class="b-tab active" id="bt1"><div class="b-tab-favicon" style="background:#10B981;"></div><span>github.com</span></div>
+            <div class="b-tab" id="bt2"><div class="b-tab-favicon" style="background:#10B981;"></div><span>github.com</span></div>
+            <div class="b-tab" id="bt3"><div class="b-tab-favicon" style="background:#EF4444;"></div><span>gmail</span></div>
+            <div class="b-tab" id="bt4"><div class="b-tab-favicon" style="background:#EF4444;"></div><span>gmail</span></div>
+            <div class="b-tab" id="bt5"><div class="b-tab-favicon" style="background:#3B82F6;"></div><span>docs</span></div>
+            <div class="b-tab" id="bt6"><div class="b-tab-favicon" style="background:#3B82F6;"></div><span>docs</span></div>
+            <div class="b-tab" id="bt7"><div class="b-tab-favicon" style="background:#8B5CF6;"></div><span>linear</span></div>
+            <div class="b-tab" id="bt8"><div class="b-tab-favicon" style="background:#EC4899;"></div><span>figma</span></div>
+            <div class="b-tab" id="bt9"><div class="b-tab-favicon" style="background:#F59E0B;"></div><span>slack</span></div>
+            <div class="b-tab" id="bt10"><div class="b-tab-favicon" style="background:#6B7280;"></div><span>notion</span></div>
+          </div>
+        </div>
+
+        <!-- Browser content -->
+        <div class="browser-content">
+
+          <!-- Chapter 1 Visual: Auto-Group -->
+          <div class="chapter-visual" id="visual-1">
+            <div class="grouped-tabs-display">
+              <div class="group-section" style="margin-bottom:4px;">
+                <div class="group-dot" style="background:#10B981;"></div>
+                <div class="group-name-badge" style="background:rgba(16,185,129,0.12);color:#10B981;">GitHub</div>
+                <div class="mini-tab"><div class="mini-favicon" style="background:#10B981;"></div>notifications</div>
+                <div class="mini-tab"><div class="mini-favicon" style="background:#10B981;"></div>pulls</div>
+              </div>
+              <div class="group-section" style="margin-bottom:4px;">
+                <div class="group-dot" style="background:#EF4444;"></div>
+                <div class="group-name-badge" style="background:rgba(239,68,68,0.12);color:#EF4444;">Gmail</div>
+                <div class="mini-tab"><div class="mini-favicon" style="background:#EF4444;"></div>inbox</div>
+                <div class="mini-tab"><div class="mini-favicon" style="background:#EF4444;"></div>sent</div>
+              </div>
+              <div class="group-section">
+                <div class="group-dot" style="background:#3B82F6;"></div>
+                <div class="group-name-badge" style="background:rgba(59,130,246,0.12);color:#3B82F6;">Docs</div>
+                <div class="mini-tab"><div class="mini-favicon" style="background:#3B82F6;"></div>Q4 roadmap</div>
+                <div class="mini-tab"><div class="mini-favicon" style="background:#3B82F6;"></div>standup</div>
+              </div>
+              <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">
+                <div style="font-size:0.65rem;color:var(--sub);font-family:'JetBrains Mono',monospace;">
+                  ✓ 10 tabs → 3 groups · Auto-Pilot active
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chapter 2 Visual: Sleep + Dedupe -->
+          <div class="chapter-visual" id="visual-2">
+            <div class="memory-visual">
+              <div>
+                <div class="memory-label">RAM footprint</div>
+                <div class="memory-bar-track">
+                  <div class="memory-bar-fill" id="memory-bar"></div>
+                </div>
+                <div class="memory-pct" id="memory-pct">87% · 1.4 GB</div>
+              </div>
+              <div class="dup-tab-row" id="dup-row">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div style="width:10px;height:10px;border-radius:2px;background:#EF4444;flex-shrink:0;"></div>
+                  <span style="font-size:0.72rem;color:var(--sub);">youtube.com/watch?v=dQw4w9WgXcQ</span>
+                </div>
+                <div class="dup-badge">× duplicate</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--yellow);flex-shrink:0;"></div>
+                <span style="font-size:0.7rem;color:var(--sub);">slack.com — idle 8m →</span>
+                <span style="font-size:0.7rem;color:var(--purple-light);font-weight:600;">sleeping</span>
+              </div>
+              <div style="font-size:0.65rem;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-top:8px;">
+                ↓ freed: ~94 MB this session
+              </div>
+            </div>
+          </div>
+
+          <!-- Chapter 3 Visual: Search -->
+          <div class="chapter-visual" id="visual-3">
+            <div class="search-visual">
+              <div class="fake-search-bar">
+                <span class="search-icon">⌕</span>
+                <span id="search-typed"></span><span class="search-cursor"></span>
+              </div>
+              <div class="search-result" id="sr1" style="transition-delay:0.1s">
+                <div class="sr-favicon" style="background:#EF4444;"></div>
+                <div class="sr-info">
+                  <div class="sr-title">Never Gonna Give You Up — YouTube</div>
+                  <div class="sr-url">youtube.com/watch?v=dQw4w9WgXcQ</div>
+                </div>
+              </div>
+              <div class="search-result" id="sr2" style="transition-delay:0.2s">
+                <div class="sr-favicon" style="background:#EF4444;"></div>
+                <div class="sr-info">
+                  <div class="sr-title">Cursor AI Tutorial — YouTube</div>
+                  <div class="sr-url">youtube.com/watch?v=abc123xyz</div>
+                </div>
+              </div>
+              <div class="search-result" id="sr3" style="transition-delay:0.3s">
+                <div class="sr-favicon" style="background:#EF4444;"></div>
+                <div class="sr-info">
+                  <div class="sr-title">React Hooks Deep Dive — YouTube</div>
+                  <div class="sr-url">youtube.com/watch?v=xyz789abc</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable Right Chapters -->
+    <div class="features-right">
+
+      <div class="chapter" id="chapter-1" data-chapter="1">
+        <div class="chapter-content">
+          <div class="eyebrow">AUTO-PILOT</div>
+          <h2 class="chapter-headline">One click. Every tab finds its home.</h2>
+          <p class="chapter-body">Set a threshold — 2, 3, or 4 tabs from the same domain — and StacTab groups them automatically. No clicks, no drag-and-drop, no menu diving.</p>
+          <div class="shortcut-badge">Alt+G</div>
+        </div>
+      </div>
+
+      <div class="chapter" id="chapter-2" data-chapter="2">
+        <div class="chapter-content">
+          <div class="eyebrow">SLEEP + DEDUPE</div>
+          <h2 class="chapter-headline">Your RAM didn't sign up for this.</h2>
+          <p class="chapter-body">StacTab sleeps tabs that have been idle. Duplicates are closed automatically. The tab stays visible — the memory footprint doesn't.</p>
+        </div>
+      </div>
+
+      <div class="chapter" id="chapter-3" data-chapter="3">
+        <div class="chapter-content">
+          <div class="eyebrow">LIVE SEARCH</div>
+          <h2 class="chapter-headline">Cmd+F, but for every tab you have open.</h2>
+          <p class="chapter-body">Search all open tabs by title and URL. Hit Alt+S anywhere — you don't even need to open the popup. Results appear instantly.</p>
+          <div class="shortcut-badge">Alt+S · Option+S on Mac</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3 — Vault
+============================================================ -->
+<section id="vault">
+  <div class="vault-inner">
+    <div class="vault-eyebrow" data-observe>WORKSPACE VAULT</div>
+    <div class="vault-headline" data-observe style="transition-delay:0.1s">The Vault</div>
+    <p class="vault-sub" data-observe style="transition-delay:0.2s">Your archived sessions live here. Every tab you've ever closed with intention, waiting for when you come back.</p>
+
+    <div class="vault-card" id="vault-card" data-observe>
+      <div class="vault-card-header">
+        <span class="vault-header-title">Sessions</span>
+        <div class="vault-header-actions">
+          <button class="vault-action-btn">↑ Export</button>
+          <button class="vault-action-btn">+ New session</button>
+        </div>
+      </div>
+
+      <div class="vault-row">
+        <span class="vault-star">✦</span>
+        <span class="vault-session-name">Tuesday Deep Work</span>
+        <span class="vault-tab-count">12 tabs</span>
+        <div class="vault-domains">
+          <div class="domain-dot" style="background:#10B981;"></div>
+          <div class="domain-dot" style="background:#EF4444;"></div>
+          <div class="domain-dot" style="background:#3B82F6;"></div>
+        </div>
+        <span class="vault-domain-names">github, linear, figma</span>
+        <button class="restore-btn">Restore</button>
+      </div>
+
+      <div class="vault-row">
+        <span class="vault-star">✦</span>
+        <span class="vault-session-name">Job Search — Week 3</span>
+        <span class="vault-tab-count">8 tabs</span>
+        <div class="vault-domains">
+          <div class="domain-dot" style="background:#0EA5E9;"></div>
+          <div class="domain-dot" style="background:#6B7280;"></div>
+          <div class="domain-dot" style="background:#8B5CF6;"></div>
+        </div>
+        <span class="vault-domain-names">linkedin, glassdoor, notion</span>
+        <button class="restore-btn">Restore</button>
+      </div>
+
+      <div class="vault-row">
+        <span class="vault-star">✦</span>
+        <span class="vault-session-name">Research: AI UX</span>
+        <span class="vault-tab-count">21 tabs</span>
+        <div class="vault-domains">
+          <div class="domain-dot" style="background:#F59E0B;"></div>
+          <div class="domain-dot" style="background:#EC4899;"></div>
+          <div class="domain-dot" style="background:#0EA5E9;"></div>
+        </div>
+        <span class="vault-domain-names">arxiv, hn, twitter</span>
+        <button class="restore-btn">Restore</button>
+      </div>
+    </div>
+
+    <p class="vault-privacy-note" data-observe style="transition-delay:0.3s">
+      StacTab stores everything locally. No servers. No accounts. No tracking.<br>Your sessions never leave your device.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 4 — Shortcuts
+============================================================ -->
+<section id="shortcuts">
+  <div class="shortcuts-eyebrow" data-observe>YOUR SHORTCUTS</div>
+  <div class="shortcuts-headline" data-observe style="transition-delay:0.1s">Two keys. Total control.</div>
+
+  <div class="shortcuts-grid">
+
+    <div class="shortcut-panel" data-observe style="transition-delay:0.15s">
+      <div class="keys-row">
+        <div class="big-key">Alt</div>
+        <span class="key-plus">+</span>
+        <div class="big-key">S</div>
+      </div>
+      <div class="shortcut-verb">Find</div>
+      <p class="shortcut-desc">Search every open tab by title or URL. Works instantly, from anywhere.</p>
+      <div class="mac-note">⌥ Option+S on Mac</div>
+    </div>
+
+    <div class="shortcut-panel" data-observe style="transition-delay:0.25s">
+      <div class="keys-row">
+        <div class="big-key">Alt</div>
+        <span class="key-plus">+</span>
+        <div class="big-key">G</div>
+      </div>
+      <div class="shortcut-verb">Group</div>
+      <p class="shortcut-desc">Manually trigger domain grouping. Use when Auto-Pilot is off.</p>
+      <div class="mac-note">⌥ Option+G on Mac</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 5 — Install CTA
+============================================================ -->
+<section id="install">
+  <div class="install-number" data-observe>10 seconds.</div>
+  <p class="install-sub1" data-observe style="transition-delay:0.1s">That's how long it takes to go from tab chaos to tab clarity.</p>
+  <p class="install-sub2" data-observe style="transition-delay:0.15s">Free. Open source. No account required.</p>
+  <div data-observe style="transition-delay:0.2s">
+    <a class="cta-btn" href="https://chromewebstore.google.com/detail/stactab/hdfcdcoogjkdogmnhhopkekanpldoefh" target="_blank">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 2c1.93 0 3.72.58 5.21 1.57L7.57 17.21A7.95 7.95 0 0 1 4 12c0-4.418 3.582-8 8-8zm0 12.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm6.43-2.79A7.95 7.95 0 0 1 20 12c0 4.418-3.582 8-8 8a7.96 7.96 0 0 1-5.21-1.93l10.64-6.36z"/></svg>
+      Add StacTab to Chrome
+    </a>
+  </div>
+  <div class="install-links" data-observe style="transition-delay:0.25s">
+    <a href="https://github.com/Manan-S26/StacTab" target="_blank">View on GitHub</a>
+    <span class="sep">·</span>
+    <a href="privacy.html">Privacy Policy</a>
+  </div>
+  <div class="trust-line" data-observe style="transition-delay:0.3s">
+    No data leaves your browser. Open source under MIT license. v1.7.1.
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="footer-logo">🗂️ StacTab</div>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <span class="sep">·</span>
+    <a href="#vault">Vault</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/Manan-S26/StacTab" target="_blank">GitHub</a>
+    <span class="sep">·</span>
+    <a href="privacy.html">Privacy</a>
+  </div>
+  <div class="footer-right">Made with purpose. Zero tracking.</div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ----------------------------------------------------------
+     NAV scroll border
+  ---------------------------------------------------------- */
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  /* ----------------------------------------------------------
+     SECTION 0 — Opening Interrupt Animation
+  ---------------------------------------------------------- */
+  if (!prefersReducedMotion) {
+    const pills = [
+      'pill-github', 'pill-notion', 'pill-gmail', 'pill-twitter', 'pill-youtube',
+      'pill-linear', 'pill-figma', 'pill-slack', 'pill-docs', 'pill-stackoverflow'
+    ];
+    const tabCounts = ['1', '7', '14', '22', '31'];
+    const numberEl = document.getElementById('interrupt-number');
+    const labelEl = document.getElementById('interrupt-label');
+    const sweepEl = document.getElementById('sweep-circle');
+    let loopTimer = null;
+
+    function setPillScattered(animate) {
+      pills.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (!animate) el.style.transition = 'none';
+        el.style.transform = `translate(calc(-50% + var(--sx)), calc(-50% + var(--sy)))`;
+      });
+    }
+
+    function setPillGrouped() {
+      pills.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.transition = 'opacity 0.4s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        el.style.transform = `translate(calc(-50% + var(--gx)), calc(-50% + var(--gy)))`;
+      });
+    }
+
+    function hidePills() {
+      pills.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('visible');
+        el.style.transition = 'opacity 0.4s ease';
+      });
+    }
+
+    function resetPillTransitions() {
+      pills.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.transition = 'opacity 0.4s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      });
+    }
+
+    function runInterruptSequence() {
+      // --- Phase 1: count up (0–2500ms) ---
+      numberEl.style.opacity = '1';
+      labelEl.style.opacity = '1';
+      labelEl.textContent = 'tabs open';
+      sweepEl.classList.remove('expanded');
+      hidePills();
+      setPillScattered(false); // instant, no transition
+
+      // Stagger pill appearance
+      let countIdx = 0;
+      pills.forEach((id, i) => {
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          resetPillTransitions();
+          el.classList.add('visible');
+          // Update number
+          if (countIdx < tabCounts.length) {
+            numberEl.textContent = tabCounts[countIdx++];
+          }
+        }, i * 150);
+      });
+
+      // Final count
+      setTimeout(() => {
+        numberEl.textContent = '31';
+      }, pills.length * 150 + 100);
+
+      // --- Phase 2: group (2500–3500ms) ---
+      setTimeout(() => {
+        sweepEl.classList.add('expanded');
+        // Transition pills to grouped positions
+        resetPillTransitions();
+        setPillGrouped();
+        // Cross-fade number
+        numberEl.style.opacity = '0';
+        setTimeout(() => {
+          numberEl.textContent = '5 groups';
+          labelEl.textContent = 'organised';
+          numberEl.style.fontSize = 'clamp(2.5rem,6vw,4.5rem)';
+          numberEl.style.opacity = '1';
+        }, 400);
+      }, 2500);
+
+      // --- Phase 3: hold (3500–5500ms) ---
+      // Just hold state.
+
+      // --- Phase 4: fade out (5500–8000ms) ---
+      setTimeout(() => {
+        numberEl.style.opacity = '0';
+        labelEl.style.opacity = '0';
+        sweepEl.classList.remove('expanded');
+        hidePills();
+      }, 5500);
+
+      setTimeout(() => {
+        numberEl.style.fontSize = '';
+        numberEl.textContent = '1';
+        labelEl.textContent = 'tabs open';
+      }, 7800);
+    }
+
+    // Start on load
+    setTimeout(runInterruptSequence, 400);
+    // Loop every 8 seconds
+    setInterval(runInterruptSequence, 8000);
+  } else {
+    // Reduced motion fallback: just show static state
+    document.getElementById('interrupt-number').textContent = '31';
+  }
+
+  /* ----------------------------------------------------------
+     SECTION 1 — Terminal Typewriter
+  ---------------------------------------------------------- */
+  const terminalLines = [
+    { text: '[StacTab v1.7.1] monitoring tabs...', color: 'var(--sub)' },
+    { text: '» opened: github.com/notifications', color: 'var(--text)' },
+    { text: '» opened: github.com/pulls', color: 'var(--text)' },
+    { text: '  ✓ grouped → "GitHub" (2 tabs)', color: 'var(--green)' },
+    { text: '» opened: notion.so/roadmap', color: 'var(--text)' },
+    { text: '» opened: notion.so/standup', color: 'var(--text)' },
+    { text: '  ✓ grouped → "Notion" (2 tabs)', color: 'var(--green)' },
+    { text: '» duplicate: youtube.com/watch?v=...', color: 'var(--text)' },
+    { text: '  × closed (already open)', color: 'var(--red)' },
+    { text: '» slack.com idle 8m → sleeping tab', color: 'var(--text)' },
+    { text: '  ↓ memory freed: ~94MB', color: 'var(--purple-light)' },
+    { text: '» archiving 6 tabs → "Morning session"', color: 'var(--text)' },
+    { text: '  ✓ saved to Vault', color: 'var(--green)' },
+    { text: '[ready]', color: 'var(--purple)' },
+  ];
+
+  const termOutput = document.getElementById('terminal-output');
+  let termSessionId = 0; // increment to cancel any running session
+
+  function typeTerminal() {
+    const sessionId = ++termSessionId;
+    termOutput.innerHTML = '';
+    let lineIdx = 0;
+    let charIdx = 0;
+    let currentSpan = null;
+
+    function tick() {
+      if (termSessionId !== sessionId) return; // cancelled
+      if (lineIdx >= terminalLines.length) {
+        setTimeout(() => {
+          if (termSessionId === sessionId) typeTerminal();
+        }, 2000);
+        return;
+      }
+
+      const line = terminalLines[lineIdx];
+
+      if (charIdx === 0) {
+        if (lineIdx > 0) {
+          termOutput.appendChild(document.createTextNode('\n'));
+        }
+        currentSpan = document.createElement('span');
+        currentSpan.style.color = line.color;
+        termOutput.appendChild(currentSpan);
+      }
+
+      if (charIdx < line.text.length) {
+        currentSpan.textContent += line.text[charIdx];
+        charIdx++;
+        setTimeout(tick, 30);
+      } else {
+        charIdx = 0;
+        lineIdx++;
+        setTimeout(tick, 500);
+      }
+    }
+
+    tick();
+  }
+
+  // Start terminal (slight delay)
+  setTimeout(typeTerminal, 600);
+
+  // Pause terminal when out of view, restart when back in view
+  let termIsVisible = true;
+  const termObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !termIsVisible) {
+        termIsVisible = true;
+        typeTerminal();
+      } else if (!e.isIntersecting) {
+        termIsVisible = false;
+        termSessionId++; // cancel running session
+      }
+    });
+  }, { threshold: 0.1 });
+  const termPanel = document.querySelector('.terminal-panel');
+  if (termPanel) termObserver.observe(termPanel);
+
+  /* ----------------------------------------------------------
+     SECTION 2 — Sticky Chapter Activation
+  ---------------------------------------------------------- */
+  let activeChapter = 0;
+  const panel = document.getElementById('features-panel');
+
+  function activateChapter(n) {
+    if (activeChapter === n) return;
+    activeChapter = n;
+
+    // Show correct visual
+    ['visual-1', 'visual-2', 'visual-3'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active', i + 1 === n);
+    });
+
+    // Trigger chapter-specific animations
+    if (n === 1) animateChapter1();
+    if (n === 2) animateChapter2();
+    if (n === 3) animateChapter3();
+  }
+
+  function animateChapter1() {
+    // Already showing static grouped view — just make sure it's visible
+  }
+
+  function animateChapter2() {
+    if (prefersReducedMotion) return;
+    const bar = document.getElementById('memory-bar');
+    const pct = document.getElementById('memory-pct');
+    const dup = document.getElementById('dup-row');
+    if (!bar) return;
+
+    bar.classList.remove('reduced');
+    pct.textContent = '87% · 1.4 GB';
+    if (dup) dup.classList.remove('dismissed');
+
+    setTimeout(() => {
+      bar.classList.add('reduced');
+      pct.textContent = '34% · 554 MB';
+      pct.style.color = 'var(--green)';
+    }, 600);
+
+    setTimeout(() => {
+      if (dup) dup.classList.add('dismissed');
+    }, 1200);
+  }
+
+  function animateChapter3() {
+    if (prefersReducedMotion) return;
+    const typed = document.getElementById('search-typed');
+    const results = ['sr1', 'sr2', 'sr3'];
+    if (!typed) return;
+
+    typed.textContent = '';
+    results.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('visible');
+    });
+
+    const query = 'youtube';
+    let i = 0;
+    function typeChar() {
+      if (i < query.length) {
+        typed.textContent += query[i++];
+        setTimeout(typeChar, 80);
+      } else {
+        // Show results
+        results.forEach((id, idx) => {
+          setTimeout(() => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('visible');
+          }, 200 + idx * 120);
+        });
+      }
+    }
+    setTimeout(typeChar, 200);
+  }
+
+  // IntersectionObserver for chapters
+  const chapterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const chapterNum = parseInt(e.target.getAttribute('data-chapter'));
+        activateChapter(chapterNum);
+      }
+    });
+  }, { threshold: 0.4, rootMargin: '-10% 0px -10% 0px' });
+
+  document.querySelectorAll('.chapter[data-chapter]').forEach(el => {
+    chapterObserver.observe(el);
+  });
+
+  // Default: show chapter 1
+  activateChapter(1);
+
+  /* ----------------------------------------------------------
+     SECTION 3 — Vault card in-view (border trace)
+  ---------------------------------------------------------- */
+  const vaultCard = document.getElementById('vault-card');
+  const vaultObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+      }
+    });
+  }, { threshold: 0.3 });
+  if (vaultCard) vaultObserver.observe(vaultCard);
+
+  /* ----------------------------------------------------------
+     GENERIC IntersectionObserver for [data-observe]
+  ---------------------------------------------------------- */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('[data-observe]').forEach(el => io.observe(el));
+
+  /* ----------------------------------------------------------
+     SMOOTH SCROLL for nav links
+  ---------------------------------------------------------- */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>
